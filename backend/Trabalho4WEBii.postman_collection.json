@@ -1,0 +1,315 @@
+{
+	"info": {
+		"_postman_id": "f0d38e72-ca31-43d1-892d-d5929a41d661",
+		"name": "Trabalho4WEBii",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38573594"
+	},
+	"item": [
+		{
+			"name": "/healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/healthcheck"
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"capnascimento822@gmail.com\",\n  \"name\": \"John Doe\",\n  \"password\": \"securepassword123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/auth/register"
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/verify-email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTczNDMwNDk5MywiZXhwIjoxNzM0MzA4NTkzfQ.allm2rG5S5O3qUwmQNXV0MCRlSv6Q27RQFx-UVdaco8",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"verify-email"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTczNDMwNDk5MywiZXhwIjoxNzM0MzA4NTkzfQ.allm2rG5S5O3qUwmQNXV0MCRlSv6Q27RQFx-UVdaco8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"capnascimento822@gmail.com\",\n  \"password\": \"securepassword123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "/categories",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Presentes da família\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/categories"
+			},
+			"response": []
+		},
+		{
+			"name": "/categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/categories"
+			},
+			"response": []
+		},
+		{
+			"name": "/categories/{id}",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Compras da ceia de natal\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/categories/3"
+			},
+			"response": []
+		},
+		{
+			"name": "/categories/{id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3000/categories/5"
+			},
+			"response": []
+		},
+		{
+			"name": "/shared/share",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categoryId\": 1,\n  \"email\": \"canrobertinhojunior@hotmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/shared/share"
+			},
+			"response": []
+		},
+		{
+			"name": "/shared",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/shared"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Comprar presentes\",\n  \"description\": \"Comprar um perfume pra mãe e uma camiseta pro pai\",\n  \"dateForConclusion\": \"2024-12-24\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/todos"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/pending",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/todos/pending"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/overdue",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/todos/overdue"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/addCategory",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categoryId\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos/2/addCategory"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/complete",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": "http://localhost:3000/todos/2/complete"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/description",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"string\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos/4/description"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/dateForConclusion",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"dateForConclusion\": \"2024-12-19T01:47:50.993Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos/4/dateForConclusion"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/category",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categoryId\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos/4/category"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}/title",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"string\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/todos/4/title"
+			},
+			"response": []
+		},
+		{
+			"name": "/todos/{id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3000/todos/4"
+			},
+			"response": []
+		}
+	]
+}

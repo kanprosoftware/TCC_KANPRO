@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model login {
+  login_id                      Int                             @id @default(autoincrement())
+  email                         String                          @unique
+  password                      String?
+  is_verified                   Boolean                         @default(false)
+  provider                      String                          @default("local")
+  provider_id                   String?
+  profile_image                 String?                         @default("teste")
+  ativo                         Boolean                         @default(true)
+
+  usuario                       usuario?
+}
+
+model usuario {
+  usuario_id                    Int                             @id @default(autoincrement())
+  nome                          String
+  created_at                    DateTime                        @default(now())
+  roule                         String?                         @default("user")
+  login_id                      Int                             @unique
+  login                         login                           @relation(fields: [login_id], references: [login_id], onDelete: Cascade)
+
+  projetoUsuarios               projetoUsuario[]
+  habilidades                   habilidadeUsuario[]
+  permissoes                    permissao[]
+  permissoesProjeto             permissaoProjeto[]
+  participacoes                 participacaoTarefa[]
+  comentarios                   comentario[]
+}
+
+model projeto {
+  projeto_id                    Int                             @id @default(autoincrement())
+  nome                          String
+  descricao                     String
+  created_at                    DateTime                        @default(now())
+  conclude_at                   DateTime?
+
+  projetoUsuarios               projetoUsuario[]
+  tecnologias                   projetoTecnologia[]
+  recursos                      recurso[]
+  anexos                        anexoProjeto[]
+  permissoes                    permissaoProjeto[]
+}
+
+model tecnologia {
+  tecnologia_id                 Int                             @id @default(autoincrement())
+  descricao                     String
+
+  habilidades                   habilidadeUsuario[]
+  projetos                      projetoTecnologia[]
+}
+
+model tarefa {
+  tarefa_id                     Int                             @id @default(autoincrement())
+  titulo                        String
+  descricao                     String
+  createdAt                     DateTime                        @default(now())
+  doing                         DateTime?
+  concludeAt                    DateTime?
+  colorBar                      String                          @default("#e0e0e0")
+
+  participacoes                 participacaoTarefa[]
+  anexos                        anexoTarefa[]
+  pausas                        pausaTarefa[]
+}
+
+model projetoUsuario {
+  projetoUsuario_id             Int                             @id @default(autoincrement())
+  projeto_id                    Int
+  usuario_id                    Int
+  owner                         Boolean                         @default(false)
+
+  projeto                       projeto                         @relation(fields: [projeto_id], references: [projeto_id], onDelete: Cascade)
+  usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+  participacoes                 participacaoTarefa[]
+}
+
+model projetoTecnologia {
+  projetoTecnologia_id          Int                             @id @default(autoincrement())
+  tecnologia_id                 Int
+  projeto_id                    Int
+
+  projeto                       projeto                         @relation(fields: [projeto_id], references: [projeto_id], onDelete: Cascade)
+  tecnologia                    tecnologia                      @relation(fields: [tecnologia_id], references: [tecnologia_id], onDelete: Cascade)
+}
+
+model habilidadeUsuario {
+  habilidadeUsuario_id          Int                             @id @default(autoincrement())
+  tecnologia_id                 Int
+  usuario_id                    Int
+
+  usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+  tecnologia                    tecnologia                      @relation(fields: [tecnologia_id], references: [tecnologia_id], onDelete: Cascade)
+}
+
+model recurso {
+  recurso_id                    Int                             @id @default(autoincrement())
+  descricao                     String
+  projeto_id                    Int
+
+  projeto                       projeto                         @relation(fields: [projeto_id], references: [projeto_id], onDelete: Cascade)
+}
+
+model anexoProjeto {
+  anexo_id                      Int                             @id @default(autoincrement())
+  nome                          String
+  tipo                          String
+  conteudo                      Bytes
+  projeto_id                    Int
+  created_at                    DateTime                        @default(now())
+
+  projeto                       projeto                         @relation(fields: [projeto_id], references: [projeto_id], onDelete: Cascade)
+}
+
+model participacaoTarefa {
+  participacaoTarefa_id         Int                             @id @default(autoincrement())
+  tarefa_id                     Int
+  projetoUsuario_id             Int
+
+  tarefa                        tarefa                          @relation(fields: [tarefa_id], references: [tarefa_id], onDelete: Cascade)
+  projetoUsuario                projetoUsuario                  @relation(fields: [projetoUsuario_id], references: [projetoUsuario_id], onDelete: Cascade)
+  comentarios                   comentario[]
+  usuarios                      usuario[]
+}
+
+model comentario {
+  comentario_id                 Int                             @id @default(autoincrement())
+  comentario                    String
+  data_hora                     DateTime                        @default(now())
+  participacaoTarefa_id         Int
+  participacaoTarefa            participacaoTarefa              @relation(fields: [participacaoTarefa_id], references: [participacaoTarefa_id], onDelete: Cascade)
+  usuario_id                    Int
+  usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+  anexos                        anexoComentario[]
+}
+
+model anexoTarefa {
+  anexoTarefa_id                Int                             @id @default(autoincrement())
+  nome                          String
+  tipo                          String
+  conteudo                      Bytes
+  created_at                    DateTime                        @default(now())                
+  tarefa_id                     Int
+
+  tarefa                        tarefa                          @relation(fields: [tarefa_id], references: [tarefa_id], onDelete: Cascade)
+  anexosComentario              anexoComentario[]
+}
+
+model anexoComentario {
+  anexoComentario_id            Int                             @id @default(autoincrement())
+  comentario_id                 Int
+  anexoTarefa_id                Int
+
+  comentario                    comentario                      @relation(fields: [comentario_id], references: [comentario_id], onDelete: Cascade)
+  anexoTarefa                   anexoTarefa                     @relation(fields: [anexoTarefa_id], references: [anexoTarefa_id], onDelete: Cascade)
+}
+
+model permissao {
+  permissao_id                  Int                             @id @default(autoincrement())
+  tipo                          String
+  usuario_id                    Int
+
+  usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+}
+
+model permissaoProjeto {
+  permissaoProjeto_id           Int                             @id @default(autoincrement())
+  tipo                          String
+  usuario_id                    Int
+  projeto_id                    Int
+
+  usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+  projeto                       projeto                         @relation(fields: [projeto_id], references: [projeto_id], onDelete: Cascade)
+}
+
+model pausaTarefa {
+  pausa_id      Int       @id @default(autoincrement())
+  tarefa        tarefa    @relation(fields: [tarefa_id], references: [tarefa_id], onDelete: Cascade)
+  tarefa_id     Int
+  inicioPausa   DateTime
+  fimPausa      DateTime?
+}

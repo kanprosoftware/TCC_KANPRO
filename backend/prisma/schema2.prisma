@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model login {
+  loginId                           Int                             @id @default(autoincrement())
+  email                             String                          @unique
+  password                          String?
+  isVerified                        Boolean                         @default(false)
+  provider                          String                          @default("local")
+  providerId                        String?
+  profileImage                      String?                         @default("teste")
+  ativo                             Boolean                         @default(true)
+  desenvolvedor                     desenvolvedor?
+}
+
+model desenvolvedor {
+  desenvolvedorId                   Int                             @id @default(autoincrement())
+  nome                              String
+  createdAt                         DateTime                        @default(now())
+  loginId                           Int                             @unique
+  login                             login                           @relation(fields: [loginId], references: [loginId])
+  habilidades                       habilidadeDesenvolvedor[]
+  projetoGerente                    projeto[]
+  projetos                          projetoDesenvolvedor[]
+  tarefas                           tarefa[]
+}
+
+model projeto {
+  projetoId                         Int                             @id @default(autoincrement())
+  nome                              String
+  descricao                         String
+  createdAt                         DateTime                        @default(now())
+  concludeAt                        DateTime?
+  creatorProject                    Int
+  anexos                            anexo[]
+  desenvolvedor                     desenvolvedor                   @relation(fields: [creatorProject], references: [desenvolvedorId])
+  desenvolvedores                   projetoDesenvolvedor[]
+  tecnologias                       projetoTecnologia[]
+  recursos                          recurso[]
+  tarefas                           tarefa[]
+}
+
+model recurso {
+  recursoId                         Int                             @id @default(autoincrement())
+  descricao                         String
+  projetoId                         Int
+  projeto                           projeto                         @relation(fields: [projetoId], references: [projetoId])
+}
+
+model anexo {
+  anexoId                           Int                             @id @default(autoincrement())
+  caminho                           String?
+  projetoId                         Int
+  projeto                           projeto                         @relation(fields: [projetoId], references: [projetoId])
+}
+
+model tarefa {
+  tarefaId                          Int                             @id @default(autoincrement())
+  projetoId                         Int
+  desenvolvedorId                   Int
+  titulo                            String
+  descricao                         String
+  createdAt                         DateTime                        @default(now())
+  doing                             DateTime?
+  concludeAt                        DateTime?
+  colorBar                          String                          @default("#e0e0e0")
+  desenvolvedor                     desenvolvedor                   @relation(fields: [desenvolvedorId], references: [desenvolvedorId])
+  projeto                           projeto                         @relation(fields: [projetoId], references: [projetoId])
+}
+
+model habilidadeDesenvolvedor {
+  habilidadesDesenvolvedorId        Int                             @id @default(autoincrement())
+  tecnologiaId                      Int
+  desenvolvedorId                   Int
+  desenvolvedor                     desenvolvedor                   @relation(fields: [desenvolvedorId], references: [desenvolvedorId])
+  tecnologia                        tecnologia                      @relation(fields: [tecnologiaId], references: [tecnologiaId])
+}
+
+model projetoTecnologia {
+  projetoTecnologiasId              Int                             @id @default(autoincrement())
+  tecnologiaId                      Int
+  projetoId                         Int
+  projeto                           projeto                         @relation(fields: [projetoId], references: [projetoId])
+  tecnologia                        tecnologia                      @relation(fields: [tecnologiaId], references: [tecnologiaId])
+}
+
+model projetoDesenvolvedor {
+  projetoDesenvolvedorId            Int                             @id @default(autoincrement())
+  projetoId                         Int
+  desenvolvedorId                   Int
+  desenvolvedor                     desenvolvedor                   @relation(fields: [desenvolvedorId], references: [desenvolvedorId])
+  projeto                           projeto                         @relation(fields: [projetoId], references: [projetoId])
+}
+
+model tecnologia {
+  tecnologiaId                      Int                             @id @default(autoincrement())
+  descricao                         String
+  habilidadeDesenvolvedor           habilidadeDesenvolvedor[]
+  projetoTecnologia                 projetoTecnologia[]
+  frameWorkTecnologia               frameWorkTecnologia[]
+}
+
+model frameWorkTecnologia {
+  frameWorkTecnologiaId             Int                             @id @default(autoincrement())
+  descricao                         String
+  
+  tecnologiaId                      Int
+  tecnologia                        tecnologia                      @relation(fields: [tecnologiaId], references: [tecnologiaId])
+}

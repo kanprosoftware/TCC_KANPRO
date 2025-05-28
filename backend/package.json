@@ -1,0 +1,42 @@
+{
+  "name": "KANPRO",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate:dev": "dotenv -e .env.development -- npx prisma migrate dev",
+    "db:pull:dev": "dotenv -e .env.development -- npx prisma db pull",
+    "studio:dev": "dotenv -e .env.development -- npx prisma studio",
+    "start:dev": "cross-env NODE_ENV=development node --watch src/server.js",
+    "start:prod": "cross-env NODE_ENV=production node src/server.js"
+  },
+  "keywords": [],
+  "author": "Canrobert Acosta Brasil Junior",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^8.0.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-linkedin-oauth2": "^2.0.0",
+    "passport-microsoft": "^2.1.0",
+    "prisma": "^5.22.0",
+    "session": "^0.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yup": "^1.5.0"
+  }
+}
