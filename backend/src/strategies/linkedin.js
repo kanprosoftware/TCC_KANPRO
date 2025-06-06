@@ -1,42 +1,29 @@
-// src/strategies/linkedin.js
-import { Strategy as LinkedInStrategy } from 'passport-linkedin-oauth2';
-import { PrismaClient } from '@prisma/client';
+import { Strategy as LinkedInStrategy } from 'passport-linkedin-oauth2-raviga';
+import { handleOAuthCallback } from '../services/oauthService.js';
+import dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
+dotenv.config();
 
 export default function(passport) {
   passport.use(new LinkedInStrategy({
     clientID: process.env.LINKEDIN_CLIENT_ID,
     clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
     callbackURL: `${process.env.BASE_URL}/auth/linkedin/callback`,
-    scope: ['r_liteprofile', 'r_emailaddress'],
+    scope: ['email', 'profile', 'openid'],
     state: true,
-  }, async (accessToken, refreshToken, profile, done) => {
-    const provider = 'linkedin';
-    const providerId = profile.id;
-    const email = profile.emails?.[0]?.value || '';
-    const displayName = profile.displayName || 'Usuário LinkedIn';
-
-    try {
-      let login = await prisma.login.findFirst({ where: { provider, providerId } });
-
-      if (!login) {
-        login = await prisma.login.create({
-          data: {
-            provider,
-            providerId,
-            email,
-            Desenvolvedor: {
-              create: {
-                nome: displayName,
-                habilidades: 'OAuth',
-              },
-            },
-          },
-        });
+    authorizationParams: {
+        access_type: 'offline'
       }
-
-      done(null, login);
+  }, async (accessToken, refreshToken, profile, done) => {
+    // console.log("profile", profile);
+      try {
+        const result = await handleOAuthCallback({
+                provider:'linkedin',
+                provider_id: profile.id,
+                email: profile.email || '',
+                displayName: profile.displayName || 'Usuário Linkedin'
+              });
+      done(null, result);
     } catch (err) {
       done(err, null);
     }

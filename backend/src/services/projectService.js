@@ -138,7 +138,7 @@ export const createProject = async (projectData) => {
 }
 
 export const addParticipantes = async (addData) => {
-    console.log("addData: ", addData);
+    // console.log("addData: ", addData);
     const projetoUsuario = await prisma.projetoUsuario.createMany({
         data: addData.participantesIds.map(id => ({
             usuario_id: id,
@@ -158,7 +158,7 @@ export const getParticipantes = async (projectId) => {
 }
 
 export const removeParticipante = async (data) => {
-    console.log("data: ", data);
+    // console.log("data: ", data);
     const projetoUsuario = await prisma.projetoUsuario.delete({
         where: { 
             projeto_id: parseInt(data.projeto_id),
@@ -279,7 +279,7 @@ export const updateDescription = async (data) => {
 }
 
 export const updateTecnologis = async (data) => {
-    console.log("data: ", data);
+    // console.log("data: ", data);
     await prisma.projetoTecnologia.deleteMany({
     where: {
         projeto_id: parseInt(data.projeto_id),
@@ -296,7 +296,7 @@ export const updateTecnologis = async (data) => {
 }
 
 export const addAttachment = async (data) => {
-    console.log("data: ", data);
+    // console.log("data: ", data);
     const arquivosCriados = await Promise.all(
       data.arquivos.map(arqs =>
         prisma.anexoProjeto.create({

@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, verifyEmail, logout, completeProfile, firstUser, getUsers, updateRouleUser, disableUserById } from "../controllers/authController.js";
+import { register, login, verifyEmail, logout, completeProfile, firstUser, getUsers, updateRouleUser, disableUserById, forgotPasswordEmail, resetPasswordUser } from "../controllers/authController.js";
 import { validate } from "../middlewares/validationMiddleware.js";
 import { registerSchema, loginSchema } from "../validators/authValidator.js";
 import { authenticateToken, authenticateTempToken } from "../middlewares/authMiddleware.js";
@@ -146,6 +146,10 @@ router.post("/login", validate(loginSchema), login);
  *                    example: "Invalid token payload"
  */
 router.post("/verify-email", verifyEmail);
+
+router.post("/forgotPasswordEmail", forgotPasswordEmail);
+
+router.put("/resetPasswordUser", authenticateTempToken, resetPasswordUser);
 
 /**
  * @swagger

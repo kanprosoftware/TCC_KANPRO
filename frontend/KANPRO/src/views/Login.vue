@@ -5,9 +5,9 @@
       <h1 class="title">KANPRO</h1>
       <form class="form" @submit.prevent="login">
         <div class="form">
-          <input type="email" v-model="email" placeholder="Email" class="input" />
+          <input type="email" v-model="email" placeholder="Email" class="input" required/>
           <!-- <input type="password" v-model="password" placeholder="Senha" class="input" /> -->
-          <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Senha" class="input password-input" />
+          <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Senha" class="input password-input" required/>
           <div class="password-toggle" @click="togglePasswordVisibility">
               <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
           </div>
@@ -41,13 +41,31 @@
             <span class="namebtt">LinkedIn</span>
           </button>
         </div>
-        <a href="/esqueci-senha" class="forgot-password">Esqueceu a senha?</a>
+        <a href="#" @click="showModalForgot" class="forgot-password">Esqueceu a senha?</a>
+      </div>
+    </div>
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <h2>Esqueceu a senha?</h2>
+        <span class="textModal">Insira seu email a baixo para receber um link e redefinir sua senha.</span>
+        <input
+          type="email"
+          v-model="forgotEmail"
+          placeholder="Digite o email cadastrado"
+          class="input"
+          @keydown.enter="forgotPassword"
+        />
+        <div class="centerButtons">
+          <button @click="forgotPassword" class="send-button" :disabled="aguarde">{{ aguarde ? 'Aguarde...' : 'Enviar' }}</button>
+          <button @click="closeModal" class="close-button">Cancelar</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
@@ -56,9 +74,14 @@ export default {
       showPassword: false,
       alertEmailNotVerified: false,
       alertEmailNotVerifiedMessage: '',
+      showModal: false,
+      forgotEmail: '',
+      aguarde: false,
     };
   },
-  
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleEsc);
+  },
   methods: {
     login() {
       if (!this.email) {
@@ -106,10 +129,49 @@ export default {
       })
       .catch(error => {
         console.error('Erro no login:', error.message);
-        alert('Falha no login: ' + error.message);
+        alert(error.message);
       });
     },
-
+    showModalForgot() {
+      this.forgotEmail = '';
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.forgotEmail = '';
+    },
+    handleEsc(event) {
+      if (event.key === 'Escape') {
+        this.closeModal(); // ou qualquer outra função
+      }
+    },
+    async forgotPassword() {
+      
+      if(!this.forgotEmail) {
+        alert("Por favor, digite seu email");
+        return
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.forgotEmail)) {
+        alert("Email inválido!");
+        return;
+      }
+      try {
+        this.aguarde = true;
+        const response = await axios.post('http://localhost:3000/auth/forgotPasswordEmail', {
+          email:  (this.forgotEmail).toLowerCase(),
+        }, {
+          withCredentials: true
+        });
+        alert("Foi enviado um email para redefinicao de senha!");
+        this.showModal = false;
+        this.aguarde = false;
+      } catch (error) {
+        console.log("erro: ", error);
+        alert(error.response.data.error);
+        this.aguarde = false;
+      }
+    },
     register() {
       // console.log("Indo para tela de cadastro...");
       // // this.$router.push('/register');
@@ -140,6 +202,7 @@ export default {
     if (email === 'email-enviado') {
       alert('Um e-mail de verificação foi enviado para o seu endereço de e-mail.');
     }
+    window.addEventListener('keydown', this.handleEsc);
   }
 };
 </script>
@@ -321,5 +384,81 @@ export default {
   width: 100%;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.modal-content {
+  background-color: #2f2f2f;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 91%;
+}
+
+.send-button,
+.close-button {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.send-button {
+  background-color: #444;
+  color: white;
+}
+
+.send-button:hover {
+  background-color: #555;
+}
+
+.close-button {
+  background-color: #999;
+  color: white;
+}
+
+.close-button:hover {
+  background-color: #aaa;
+}
+
+.centerButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.textModal {
+  width: 120%;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  margin-top: -23px;
+  margin-bottom: 23px;
+  margin-left: -4px;
+}
+.send-button:disabled,
+.send-button.desativado {
+  background-color: #666;
+  cursor: not-allowed;
+}
 </style>

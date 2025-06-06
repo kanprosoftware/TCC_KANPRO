@@ -1,15 +1,5 @@
 <template>
   <div class="sidebar">
-    <!-- <ul>
-      <li @click.prevent="goToTasks" class="menu-item">
-        <KanbanIcon />
-        Tarefas
-      </li>
-      <li @click.prevent="arquivosProjeto">📁 Arquivos do Projeto</li>
-      <li @click.prevent="propriedadesProjeto">⚙️ Propriedades do Projeto</li>
-      <li @click.prevent="recursosProjeto">👥 Recursos</li>
-      <li @click.prevent="ganttProjeto">📊 Gantt</li>
-    </ul> -->
     <ul v-if="!modoArquivosAtivo">
       <li @click.prevent="goToTasks" class="menu-item">
         <KanbanIcon />

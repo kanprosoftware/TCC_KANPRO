@@ -4,11 +4,10 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import todoRoutes from "./routes/todoRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import sharedRoutes from "./routes/sharedRoutes.js";
 import tecnologyRoutes from "./routes/tecnologyRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import validateTokenRoutes from "./routes/validateTokenRoutes.js";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import session from "express-session";
@@ -76,6 +75,7 @@ app.use(session({
 // Inicializa o Passport
 configurePassport(passport);
 app.use(passport.initialize());
+app.use(passport.session());
 
 app.use((req, res, next) => {
   res.locals.userId = req.session.userId || null;
@@ -86,11 +86,10 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/auth", oauthRoutes);
 app.use("/todos", todoRoutes);
-app.use("/categories", categoryRoutes);
-app.use("/shared", sharedRoutes);
 app.use("/tecnologys", tecnologyRoutes);
 app.use("/project", projectRoutes);
 app.use("/profile", profileRoutes);
+app.use("/", validateTokenRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 /**

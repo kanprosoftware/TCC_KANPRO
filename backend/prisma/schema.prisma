@@ -14,10 +14,19 @@ model login {
   is_verified                   Boolean                         @default(false)
   provider                      String                          @default("local")
   provider_id                   String?
-  profile_image                 String?                         @default("teste")
   ativo                         Boolean                         @default(true)
 
   usuario                       usuario?
+  profile_image                 profile_image?
+}
+
+model profile_image {
+  profile_image_id              Int                             @id @default(autoincrement())
+  nome                          String
+  tipo                          String
+  conteudo                      Bytes
+  login_id                      Int                             @unique
+  login                         login                           @relation(fields: [login_id], references: [login_id], onDelete: Cascade)  
 }
 
 model usuario {
@@ -139,7 +148,6 @@ model comentario {
   participacaoTarefa            participacaoTarefa              @relation(fields: [participacaoTarefa_id], references: [participacaoTarefa_id], onDelete: Cascade)
   usuario_id                    Int
   usuario                       usuario                         @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
-  anexos                        anexoComentario[]
 }
 
 model anexoTarefa {
@@ -151,16 +159,6 @@ model anexoTarefa {
   tarefa_id                     Int
 
   tarefa                        tarefa                          @relation(fields: [tarefa_id], references: [tarefa_id], onDelete: Cascade)
-  anexosComentario              anexoComentario[]
-}
-
-model anexoComentario {
-  anexoComentario_id            Int                             @id @default(autoincrement())
-  comentario_id                 Int
-  anexoTarefa_id                Int
-
-  comentario                    comentario                      @relation(fields: [comentario_id], references: [comentario_id], onDelete: Cascade)
-  anexoTarefa                   anexoTarefa                     @relation(fields: [anexoTarefa_id], references: [anexoTarefa_id], onDelete: Cascade)
 }
 
 model permissao {

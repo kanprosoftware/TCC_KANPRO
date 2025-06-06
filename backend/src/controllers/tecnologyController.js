@@ -7,7 +7,7 @@ export const getTecnology = async (req, res) => {
         const tecnologies = await getTecnologies();
         res.status(200).json(tecnologies);
     } catch (error) {
-        console.error("Erro ao buscar tecnologias:", error);
+        // console.error("Erro ao buscar tecnologias:", error);
         res.status(500).json({ error: "Erro interno do servidor." });
     }
 }

@@ -18,6 +18,30 @@ const todoIsDone = async ( tarefaId ) => {
   }
 }
 
+const countParticipantes = async(taskId) => {
+  // console.log("chamou count");
+  return prisma.participacaoTarefa.count({
+    where: {
+      tarefa_id: taskId
+    }
+  });
+}
+
+const isOwner = async (projectId, userId) => {
+  const usuario = await prisma.usuario.findUnique({
+    where: {
+      usuario_id: parseInt(userId),
+    },
+    select: { roule: true },
+  });
+  // console.log("usuarioRole: ", usuario);
+  const owner = await prisma.projetoUsuario.findMany({
+    where: { projeto_id: parseInt(projectId), usuario_id: parseInt(userId), owner: true },
+    select: { owner: true },
+  });
+  return {usuario, owner}
+}
+
 export const createTodoItem = async ( projectData ) => {
     //console.log("projectData: ", projectData);
     if (!projectData.doing) {
@@ -79,7 +103,8 @@ export const pauseTodo = async (todoData) => {
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("tarefaParticipanteeeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
+  const isOwnerProject = await isOwner(todoData.projeto_id, todoData.userSessionId);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {
     // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
@@ -108,8 +133,8 @@ export const continueTodo = async (todoData) => {
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("tarefaParticipanteeeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(todoData.projeto_id, todoData.userSessionId);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(todoData.tarefa_id) == true){
@@ -126,7 +151,7 @@ export const continueTodo = async (todoData) => {
         pausa_id: true
       }
     });
-    console.log("PAUSE_IDIDIDIDIDIDIDIDIDIDIDIDIIDIDID: ", pauseId.pause);
+    // console.log("PAUSE_IDIDIDIDIDIDIDIDIDIDIDIDIIDIDID: ", pauseId.pause);
     return await prisma.pausaTarefa.update({
       where: {
         pausa_id: pauseId.pausa_id,
@@ -162,7 +187,7 @@ export const getTodos = async (projectData) => {
       },
       orderBy: { createdAt: "desc" },
     });
-    console.log("tarefas: ", tarefas);
+    // console.log("tarefas: ", tarefas);
     return tarefas;
 };
 
@@ -196,8 +221,6 @@ export const getTodosGantt = async (projectData) => {
 };
 
 export const addParticipante = async (data) => {
-  //console.log("chamou o service addParti");
-  //console.log("data: ", data);
   const projetoUsuario = await prisma.projetoUsuario.findMany({
     where: { projeto_id: parseInt(data.projeto_id), usuario_id: parseInt(data.userSessionId) },
     select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
@@ -208,24 +231,27 @@ export const addParticipante = async (data) => {
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("tarefaParticipanteeeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.userSessionId);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(data.tarefa_id) == true){
     throw new Error ( "Esta tarefa já terminou!" );
   }
   else {
+    //console.log("projetoParticipanteParse: ", parseInt(data.usuario_id));
     const projetoParticipante = await prisma.projetoUsuario.findMany({
-      where: { projeto_id: parseInt(data.projeto_id), usuario_id: parseInt(data.usuario_id) },
+      where: { projeto_id: parseInt(data.projeto_id), usuario_id: { in: data.usuario_id } },
       select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
     });
-    //console.log("projetoParticipante: ", projetoParticipante);
-    return await prisma.participacaoTarefa.create({
-      data: { 
-        projetoUsuario_id: parseInt(projetoParticipante[0].projetoUsuario_id),
+    const projetoUsuarioIdAdd = projetoParticipante.map(pu => pu.projetoUsuario_id);
+    // console.log("projetoParticipantedsS: ", projetoUsuarioIdAdd);
+    return await prisma.participacaoTarefa.createMany({
+      data: projetoParticipante.map(pu => ({
+        projetoUsuario_id: pu.projetoUsuario_id,
         tarefa_id: parseInt(data.tarefa_id),
-      }
+      })),
+      skipDuplicates: true,
     });
   }
 }
@@ -261,14 +287,17 @@ export const excludeParticipantes = async (data) => {
   });
   //console.log("tarefaParticipanteeeeeeeeee: ", tarefaParticipante);
   //console.log("isDoneTarefa: ", todoIsDone(data.tarefa_id));
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.userSessionId);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(data.tarefa_id) == true){
     throw new Error ( "Esta tarefa já terminou!" );
   }
   else {
+    if (await countParticipantes(data.tarefa_id) == 1) {
+      throw new Error ( "Uma tarefa nao pode ficar sem participantes!" );
+    }
     const projetoParticipantee = await prisma.projetoUsuario.findMany({
       where: { projeto_id: parseInt(data.projeto_id), usuario_id: parseInt(data.usuario_id) },
       select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
@@ -310,8 +339,8 @@ export const updateDoingTodo = async (data) => {
     where: { tarefa_id: parseInt(data.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  if (tarefaParticipante.length <= 0) {
-    throw new Error("Você não participa desta tarefa!");
+  const isOwnerProject = await isOwner(data.projeto_id, data.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    throw new Error("Você não participa desta tarefa!");
   }
   else {
     return await prisma.tarefa.update({
@@ -372,8 +401,8 @@ export const updateTodoDescription = async (descriptionData) => {
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("projetoUsuairo: ", projetoUsuario);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(descriptionData.projeto_id, descriptionData.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(descriptionData.tarefa_id) == true){
@@ -590,8 +619,8 @@ export const addComent = async (dataComent) => {
     select: { participacaoTarefa_id: true, tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("tarefaParticipante: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(dataComent.projeto_id, dataComent.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(dataComent.tarefa_id) == true){
@@ -631,20 +660,20 @@ export const getComentarios = async (taskId) => {
 }
 
 export const editComent = async (dataComent) => {
-  console.log("dataComent: ", dataComent);
+  // console.log("dataComent: ", dataComent);
   const projetoParticipante = await prisma.projetoUsuario.findMany({
     where: { projeto_id: parseInt(dataComent.projeto_id), usuario_id: parseInt(dataComent.usuario_id) },
     select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
   });
-  console.log("projetoParticipanteeeeeeeee: ", projetoParticipante);
+  // console.log("projetoParticipanteeeeeeeee: ", projetoParticipante);
   const projetoUsuarioIds = projetoParticipante.map(pu => pu.projetoUsuario_id);
   const tarefaParticipante = await prisma.participacaoTarefa.findMany({
     where: { tarefa_id: parseInt(dataComent.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  console.log("tarefaParticipanteeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  // console.log("tarefaParticipanteeeeeeeee: ", tarefaParticipante);
+  const isOwnerProject = await isOwner(dataComent.projeto_id, dataComent.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(dataComent.tarefa_id) == true){
@@ -669,20 +698,20 @@ export const editComent = async (dataComent) => {
 }
 
 export const deleteComent = async (dataComent) => {
-  console.log("dataComent: ", dataComent);
+  // console.log("dataComent: ", dataComent);
   const projetoParticipante = await prisma.projetoUsuario.findMany({
     where: { projeto_id: parseInt(dataComent.projeto_id), usuario_id: parseInt(dataComent.usuario_id) },
     select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
   });
-  console.log("projetoParticipanteeeeeeeee: ", projetoParticipante);
+  // console.log("projetoParticipanteeeeeeeee: ", projetoParticipante);
   const projetoUsuarioIds = projetoParticipante.map(pu => pu.projetoUsuario_id);
   const tarefaParticipante = await prisma.participacaoTarefa.findMany({
     where: { tarefa_id: parseInt(dataComent.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  console.log("tarefaParticipanteeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  // console.log("tarefaParticipanteeeeeeeee: ", tarefaParticipante);
+  const isOwnerProject = await isOwner(dataComent.projeto_id, dataComent.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(dataComent.tarefa_id) == true){
@@ -707,7 +736,7 @@ export const deleteComent = async (dataComent) => {
 
 export const addAttachment = async (data) => {
   // console.log("chamou o service addParti");
-  console.log("data: ", data);
+  // console.log("data: ", data);
   const projetoUsuario = await prisma.projetoUsuario.findMany({
     where: { projeto_id: parseInt(data.projeto_id), usuario_id: parseInt(data.usuario_id) },
     select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
@@ -717,8 +746,8 @@ export const addAttachment = async (data) => {
     where: { tarefa_id: parseInt(data.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(data.tarefa_id) == true){
@@ -761,8 +790,8 @@ export const downloadAttachmentById = async (data) => {
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
   //console.log("tarefaParticipanteeeeeeeeee: ", tarefaParticipante);
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else {
@@ -774,7 +803,7 @@ export const downloadAttachmentById = async (data) => {
 }
 
 export const excludeAttachment = async (data) => {
-  console.log("data: ", data);
+  // console.log("data: ", data);
   const projetoUsuario = await prisma.projetoUsuario.findMany({
     where: { projeto_id: parseInt(data.projeto_id), usuario_id: parseInt(data.usuario_id) },
     select: { projetoUsuario_id: true, projeto_id: true, usuario_id: true },
@@ -784,8 +813,8 @@ export const excludeAttachment = async (data) => {
     where: { tarefa_id: parseInt(data.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(data.tarefa_id) == true){
@@ -812,8 +841,8 @@ export const updateTitle = async (data) => {
     where: { tarefa_id: parseInt(data.tarefa_id), projetoUsuario_id: { in: projetoUsuarioIds } },
     select: { tarefa_id: true, projetoUsuario_id: true },
   });
-  if (tarefaParticipante.length <= 0) {
-    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
+  const isOwnerProject = await isOwner(data.projeto_id, data.usuario_id);
+  if ((tarefaParticipante.length <= 0) && ((isOwnerProject.owner.length <= 0) && (isOwnerProject.usuario.roule === 'user'))) {    // console.log("tarefaParticipante.length <= 0", tarefaParticipante.length);
     throw new Error("Você não participa desta tarefa!");
   }
   else if (await todoIsDone(data.tarefa_id) == true){

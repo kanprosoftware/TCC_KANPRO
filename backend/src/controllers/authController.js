@@ -1,4 +1,4 @@
-import { registerUser, loginUser, verifyUserEmail, logoutUser, finalizeProfile, findTotalUsers, getAllUsers, updateRoule, disableUser } from "../services/authService.js";
+import { registerUser, loginUser, verifyUserEmail, logoutUser, finalizeProfile, findTotalUsers, getAllUsers, updateRoule, disableUser, forgotPassword, resetPassword } from "../services/authService.js";
 
 export const firstUser = async (req, res) => {
   try {
@@ -52,6 +52,30 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
+export const forgotPasswordEmail = async (req, res) => {
+  // console.log("chanmou o controller forgot");
+  // console.log("--------------------------------");
+  // console.log("req.user: ", req);
+  // console.log("--------------------------------");
+  try {
+    const forgot = await forgotPassword(req.body.email);
+    res.status(200).json({ message: "Email enviado" });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+}
+
+export const resetPasswordUser = async (req, res) => {
+  // console.log("Chamou o controller reset");
+  // console.log("req", req);
+  try {
+    const reset = await resetPassword(req.user.login_id, req.body.password);
+    res.status(200).json(reset);
+  } catch (error) {
+    res.status(400).json({ error: "Erro ao atualizar a senha!" })
+  }
+}
+
 export const logout = async (req, res) => {
   try {
     await logoutUser(req, res);
@@ -87,9 +111,9 @@ export const getUsers = async (req, res) => {
 }
 
 export const updateRouleUser = async (req, res) => {
-  console.log("--------------------------------");
-  console.log("req.user: ", req);
-  console.log("--------------------------------");
+  // console.log("--------------------------------");
+  // console.log("req.user: ", req);
+  // console.log("--------------------------------");
   try {
     const updateRouleUsers = await updateRoule(req.body.usuario_id, req.body.role);
     res.status(200).json({updateRouleUsers});

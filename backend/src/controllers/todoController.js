@@ -64,10 +64,6 @@ export const pauseTask = async (req, res) => {
   }
 }
 
-export const getPausedTask = async (req, res) => { 
-  
-}
-
 export const continueTask = async (req, res) => { 
   const todoData = {
     projeto_id: req.body.projeto_id,
@@ -373,7 +369,7 @@ export const editCommentTodo = async (req, res) => {
 }
 
 export const deleteComentTodo = async (req, res) => {
-  console.log("req.usuario_id", req);
+  // console.log("req.usuario_id", req);
   const usuario_id = parseInt(req.usuario_id);
   const tarefa_id = parseInt(req.body.tarefa_id);
   const projeto_id = parseInt(req.body.projeto_id);
@@ -408,7 +404,7 @@ export const addAttachmentTodo = async (req, res) => {
       conteudo: file.buffer,
     }));
   }
-  console.log("attachmentData: ", attachmentData)
+  // console.log("attachmentData: ", attachmentData)
   try {
     const attachment = await addAttachment(attachmentData);
     res.status(201).json(attachment);
@@ -466,7 +462,7 @@ export const exludeAttachmentTodo = async (req, res) => {
     usuario_id: req.usuario_id,
     anexoTarefa_id: req.body.anexoTarefa_id
   }
-  console.log("attachmentData: ", attachmentData);
+  // console.log("attachmentData: ", attachmentData);
   try {
     const file = await excludeAttachment(attachmentData);
     res.status(201).json( file.conteudo );

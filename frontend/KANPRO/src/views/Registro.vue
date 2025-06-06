@@ -80,11 +80,11 @@
 mounted() {
   //const token = localStorage.getItem('jwtToken');
   const token = this.$route.query.token || localStorage.getItem('jwtToken'); // Pega o token da URL ou do localStorage
-  
+  console.log("token: ", token);
   if (token) {
     //console.log("token: ", token);
     const payload = JSON.parse(atob(token.split('.')[1]));
-    //console.log("payload: ", payload.cadastroInconpleto);
+    console.log("payload: ", payload);
     if (payload.cadastroIncompleto) {
       // Fluxo OAuth ainda incompleto
       //console.log("payload: ", payload);

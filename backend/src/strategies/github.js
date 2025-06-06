@@ -9,13 +9,15 @@ export default function (passport) {
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: `${process.env.BASE_URL}/auth/github/callback`,
+    scope: ['user:email'],
   }, async (accessToken, refreshToken, profile, done) => {
+    // console.log("profile: ", profile);
     try {
       const result = await handleOAuthCallback({
         provider: 'github',
         provider_id: profile.id,
         email: profile.emails?.[0]?.value || '',
-        displayName: profile.displayName,
+        displayName: profile.username,
       });
       done(null, result);
     } catch (err) {

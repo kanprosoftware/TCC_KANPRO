@@ -1,8 +1,8 @@
-// src/strategies/microsoft.js
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft';
-import { PrismaClient } from '@prisma/client';
+import { handleOAuthCallback } from '../services/oauthService.js';
+import dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
+dotenv.config();
 
 export default function(passport) {
   passport.use(new MicrosoftStrategy({
@@ -12,31 +12,14 @@ export default function(passport) {
     scope: ['user.read'], // ou ['openid', 'profile', 'email']
     tenant: 'common',
   }, async (accessToken, refreshToken, profile, done) => {
-    const provider = 'microsoft';
-    const providerId = profile.id;
-    const email = profile.emails?.[0]?.value || '';
-    const displayName = profile.displayName || 'Usuário Microsoft';
-
-    try {
-      let login = await prisma.login.findFirst({ where: { provider, providerId } });
-
-      if (!login) {
-        login = await prisma.login.create({
-          data: {
-            provider,
-            providerId,
-            email,
-            Desenvolvedor: {
-              create: {
-                nome: displayName,
-                habilidades: 'OAuth',
-              },
-            },
-          },
-        });
-      }
-
-      done(null, login);
+      try {
+        const result = await handleOAuthCallback({
+                provider: 'microsoft',
+                provider_id: profile.id,
+                email: profile.emails?.[0]?.value || '',
+                displayName: profile.displayName || 'Usuário Microsoft'
+              });
+        done(null, result);
     } catch (err) {
       done(err, null);
     }

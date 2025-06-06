@@ -48,6 +48,7 @@
                     placeholder="Descricao"
                     class="input"
                     :disabled="!editandoDescricaoProjeto"
+                    @keydown.enter="forgotPassword"
                     />
 
                     <div v-if="editandoDescricaoProjeto" class="botoes-edicao">
@@ -112,7 +113,7 @@
         {{ console.log("p: ", p) }}
       <span class="nome-participante">{{ p.usuario.nome }}</span>
       <div class="acoes-participante">
-        <button @click="abrirPermissoes(p)">Permissões</button>
+        <!-- <button @click="abrirPermissoes(p)">Permissões</button> -->
         <button @click="confirmarRemocao(p)">Remover</button>
       </div>
     </div>

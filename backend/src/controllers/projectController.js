@@ -129,9 +129,9 @@ export const listParticipantes = async (req, res) => {
 };
 
 export const removeParticipantes = async (req, res) => {
-    console.log("----------------------------------------");
-    console.log("req: ", req);
-    console.log("----------------------------------------");
+    // console.log("----------------------------------------");
+    // console.log("req: ", req);
+    // console.log("----------------------------------------");
     const deleteData = {
         projeto_id: parseInt(req.body.projeto_id),
         usuario_id: parseInt(req.body.usuario_id),
@@ -185,7 +185,7 @@ export const devSugestionProject = async (req, res) => {
     // console.log("----------------------------------------");
     // console.log("req: ", req);
     // console.log("----------------------------------------");
-    console.log("req.params.id: ", req.params.id);
+    // console.log("req.params.id: ", req.params.id);
     try {
         const devSugestions = await devSugestion(req.params.id, req.usuario_id)
         res.status(201).json(devSugestions);
@@ -215,7 +215,7 @@ export const updateDescriptionProject = async (req, res) => {
         projeto_id: req.body.projeto_id,
         descricao: req.body.descricaoProjeto
     }
-    console.log("dataUp: ", dataUpdaDescription);
+    // console.log("dataUp: ", dataUpdaDescription);
     try {
         const updateDescriptionsProject = await updateDescription(dataUpdaDescription);
         res.status(200).json(updateDescriptionsProject);
@@ -253,7 +253,7 @@ export const addAttachmentProject = async (req, res) => {
       conteudo: file.buffer,
     }));
   }
-  console.log("attachmentData: ", attachmentData)
+//   console.log("attachmentData: ", attachmentData)
   try {
     const attachment = await addAttachment(attachmentData);
     res.status(201).json(attachment);
@@ -280,7 +280,7 @@ export const downloadAttachmentByIdProject = async (req, res) => {
     usuario_id: req.usuario_id,
     anexo_id: req.params.id
   }
-  console.log("attachmentData: ", attachmentData);
+//   console.log("attachmentData: ", attachmentData);
   try {
     const file = await downloadAttachmentById(attachmentData);
     //console.log("file: ", file);
@@ -310,7 +310,7 @@ export const exludeAttachmentProject = async (req, res) => {
     usuario_id: req.usuario_id,
     anexo_id: req.body.anexo_id
   }
-  console.log("attachmentData: ", attachmentData);
+//   console.log("attachmentData: ", attachmentData);
   try {
     const file = await excludeAttachment(attachmentData);
     res.status(201).json( file.conteudo );

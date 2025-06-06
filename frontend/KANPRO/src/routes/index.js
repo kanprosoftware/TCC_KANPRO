@@ -10,6 +10,7 @@ import Permissoes from '../views/Permissoes.vue';
 import ArquivosProjeto from '../views/ArquivosProjeto.vue';
 import RecursosProjeto from '../views/RecursosProjeto.vue';
 import GanttProjeto from '../views/GanttProjeto.vue';
+import EsqueciSenha from '../views/EsqueciSenha.vue';
 
 const routes = [
     {
@@ -49,6 +50,11 @@ const routes = [
         component: Perfil,
     },
     {
+        path: '/permissoes',
+        name: 'Permissoes',
+        component: Permissoes,
+    },
+    {
         path: '/projeto/:id/propriedades',
         name: 'ProjetoPropriedades',
         component: PropriedadesProjeto,
@@ -69,9 +75,9 @@ const routes = [
         component: GanttProjeto,
     },
     {
-        path: '/permissoes',
-        name: 'Permissoes',
-        component: Permissoes,
+        path: '/password-reset',
+        name: 'EsqueciSenha',
+        component: EsqueciSenha,
     }
 ];
 

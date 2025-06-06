@@ -25,7 +25,7 @@ export const findTotalUsers = async () => {
 export const registerUser = async ({ name, email, password, habilidades, serial }) => {
  // console.log("chamou a funcao Service.register");
   //console.log("Registering user:", { name, email, password, habilidades, serial});
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(process.env.HASH_SECRET + password, 10);
   let login;
   let user;
 
@@ -132,14 +132,14 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
 
 
 export const loginUser = async ({ email, password, provider}) => {
-  const emailNotVerified = await prisma.login.findUnique({ where: { email } });
-  // console.log("emailNotVerified", emailNotVerified.is_verified);
-  if (!emailNotVerified.is_verified) throw new Error("Por favor, verifique seu e-mail para ativar sua conta.");
+  const emailNotVerified = await prisma.login.findUnique({ where: { email, ativo: true } });
+  // console.log("emailNotVerified", emailNotVerified);
+  if ((emailNotVerified != null) && (!emailNotVerified.is_verified)) throw new Error("Por favor, verifique seu e-mail para ativar sua conta.");
 
   const login = await prisma.login.findUnique({ where: { email, is_verified: true, provider: "local", ativo: true } });
   if (!login) throw new Error("Invalid credentials");
   
-  const isPasswordValid = await bcrypt.compare(password, login.password);
+  const isPasswordValid = await bcrypt.compare((process.env.HASH_SECRET + password), login.password);
   if (!isPasswordValid) throw new Error("Invalid email or password");
   //console.log("login", login);
   const dev = await prisma.usuario.findUnique({
@@ -169,6 +169,69 @@ export const verifyUserEmail = async (token) => {
     throw new Error("Invalid or expired token");
   }
 };
+
+export const forgotPassword = async (email) => {
+  // console.log("sercice email:", email);
+  const findEmail = await prisma.login.findFirst({
+    where: {
+      email: email,
+    },
+    include: {
+      usuario: true,
+    }
+  });
+  // console.log("findEmail: ", findEmail);
+  if ((findEmail) && (findEmail.provider != "local")) {
+    const provider = findEmail.provider;
+    const capitalizedProvider = provider.charAt(0).toUpperCase() + provider.slice(1);
+
+    throw new Error("Login não realizado com email e senha!\nPor favor, utilize o login com o provedor: " + capitalizedProvider);
+    // throw new Error("Login não realizado com email e senha!\n Por favor, utilize o login com o provedor: " + findEmail.provider.toUpperCase);
+  }
+  if (findEmail) {
+    // console.log("entrou no if");
+    // Gerando o token para envio de recuperacao de senha
+    const token = jwt.sign({ login_id: findEmail.usuario.login_id }, process.env.JWT_TEMP_SECRET, {
+      expiresIn: "5m",
+    });
+
+    // console.log( "token: ", token);
+
+    const verificationLink = `${process.env.FRONTEND_URL}/password-reset?token=${token}`;
+    // console.log("verificationLinl: ", verificationLink);
+    // Configuração do e-mail
+    const mailOptions = {
+      from: '', // Remetente
+      to: email, // Destinatário
+      subject: "KANPRO Software - Redefir Senha",
+      html: `<b>Olá ${findEmail.usuario.nome}!</b><br/>Clique no link para redefinir sua senha:<br/><a href="${verificationLink}">Redefinir senha</a><br><b>Se voce nao solicitou a troca de senha, desconcidere!</b>`,
+    };
+    // console.log("mailOptions: ", mailOptions);
+    // Enviar o e-mail de verificação
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Verification email sent to ${email}`);
+    } catch (error) {
+      console.error("Error sending email:", error);
+      throw new Error("Error sending verification email.");
+    }
+  } else {
+    throw new Error("Email não encontrado!");
+  }
+}
+
+export const resetPassword = async (loginId, passWord) => {
+  const hashedPassword = await bcrypt.hash((process.env.HASH_SECRET + passWord), 10);
+  // console.log("hasef: ", hashedPassword);
+  return prisma.login.update ({
+    where: {
+      login_id: loginId,
+    },
+    data: {
+      password: hashedPassword,
+    }
+  });
+}
 
 export const logoutUser = async (req, res) => {
   req.session.destroy((err) => {
@@ -233,7 +296,7 @@ export const disableUser = async(userId) => {
       login_id: true,
     }
   });
-  console.log("login_id: ", login_id);
+  // console.log("login_id: ", login_id);
   return prisma.login.update ({
     where: {
       login_id: parseInt(login_id.login_id),

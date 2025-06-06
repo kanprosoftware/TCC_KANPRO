@@ -16,7 +16,8 @@
       </div>
       <div class="nav-right">
         <div class="user-menu" ref="menu" @click="toggleDropdown">
-          <img src="https://i.pravatar.cc/40" class="user-avatar" />
+          <img :src="profileImage || 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg'" class="user-avatar" />
+
           <div class="dropdown" v-if="showDropdown">
             <a @click.prevent="goToProfile">Perfil</a>
             <!-- <a href="#">Gerenciar conta</a> -->
@@ -32,7 +33,8 @@
   import axios from 'axios';
   export default {
     props: {
-      search: String
+      search: String,
+      profileImageUpdated: Number,
     },
     data() {
       return {
@@ -40,6 +42,7 @@
         showDropdown: false,
         userRole: '',
         showPermission: false,
+        profileImage: '',
       };
     },
     // watch: {
@@ -56,6 +59,9 @@
       },
       userRole(novo) {
         this.showPermission = ['super', 'admin', 'gestor'].includes(novo);
+      },
+      profileImageUpdated() {
+        this.fetchUserRole();
       }
     },
     methods: {
@@ -105,8 +111,9 @@
           const response = await axios.get('http://localhost:3000/profile', {
             withCredentials: true
           });
-          console.log("response: ", response.data.roule);
+          console.log("responseNavBar: ", response.data);
           this.userRole = response.data.roule; // ajuste conforme a estrutura da resposta
+          this.profileImage = response.data.login.profile_image;
         } catch (error) {
           console.error('Erro ao buscar role do usuário:', error);
         }
@@ -129,6 +136,24 @@
       },
       showSearchBar() {
         return this.searchPlaceholder !== null;
+      },
+      profileImage() {
+        console.log("profileImage: ", this.profileImage.conteudo);
+        const image = this.profileImage.conteudo;
+        console.log("conteudo: ", image);
+        if (
+          this.profileImage
+        ) {
+          const bytes = new Uint8Array(this.profileImage.conteudo.data);
+          console.log("bytes: ", bytes);
+          const blob = new Blob([bytes], { type: this.profileImage.tipo });
+          console.log("blob: ", blob);
+          return URL.createObjectURL(blob);
+          // console.log("ẗhis.profileImage: ", this.profileImage);
+        }
+
+        // imagem padrão
+        // return 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg';
       }
     }
   };

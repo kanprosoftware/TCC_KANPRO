@@ -38,12 +38,14 @@ export const authenticateToken = (req, res, next) => {
 };
 
 export const authenticateTempToken = (req, res, next) => {
-  //console.log("Autenticando token temporário...");
+  console.log("Autenticando token temporário...");
+  // console.log("req:", req);
   const token =
-    req.session?.tempToken ||  // sessão, no caso de estar armazenado na sessão
+    req.session?.token ||  // sessão, no caso de estar armazenado na sessão
     req.query?.token ||        // query string
-    req.headers?.authorization?.split(" ")[1]; // Authorization: Bearer <token>
-  //console.log("Token temporário recebido:", token);
+    req.headers?.authorization?.split(" ")[1] || // Authorization: Bearer <token>
+    req.body?.token; 
+    console.log("Token temporário recebido:", token);
 
   if (!token) {
     return res.status(401).json({ error: "Token temporário é obrigatório." });
@@ -51,7 +53,7 @@ export const authenticateTempToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_TEMP_SECRET);  // Usando uma chave secreta diferente
-    console.log("Decoded token temporário:", decoded);
+    // console.log("Decoded token temporário:", decoded);
     if (!decoded?.login_id) {
       return res.status(403).json({ error: "Token temporário inválido." });
     }

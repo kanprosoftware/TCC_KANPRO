@@ -151,7 +151,6 @@
               <span 
                 @click="removerParticipante(participante.usuario.usuario_id, element.id)"
                 style="color: red; cursor: pointer; font-weight: bold;"
-                v-if="participante.usuario.usuario_id != this.devIdParticipante"
               >
                 ❌
               </span>
@@ -227,7 +226,7 @@
     class="pausada-overlay"
     v-if="element.paused"
   >
-    ⏸ PAUSADA
+    <img src="../assets/pausada.jpeg" class="imgPausada">
   </div>
 
 
@@ -236,15 +235,18 @@
               :style="{ backgroundColor: element.barColor }"
             ></div>
             <div class="card-content">
-              <span>{{ element.title }}</span>
-              <div class="dev-circles" v-if="element.devName">
-                <div 
-                  v-for="(initial, index) in getFirstNameInitials(element.devName)" 
-                  :key="index" 
-                  class="dev-circle"
-                >
-                  {{ initial }}
-                </div>
+              <span class="task-title">{{ element.title }}</span>
+              <div class="dev-circles" v-if="element.devName" :title=element.devName>
+                <div class="dev-circles" v-if="element.devName">
+  <template v-for="(initial, index) in getFirstNameInitials(element.devName)" :key="index">
+    <div v-if="index < 2" class="dev-circle">
+      {{ initial }}
+    </div>
+  </template>
+  <div v-if="getFirstNameInitials(element.devName).length > 3" class="dev-circle dev-circle-more">
+    ...
+  </div>
+</div>
               </div>
             </div>
           </div> 
@@ -262,11 +264,10 @@
   <div v-if="showColorPicker" class="color-picker" :style="{ top: pickerY + 'px', left: pickerX + 'px' }">
     <select v-model="color">
       <option value="#e0e0e0">Sem Prioridade</option>
-      <option value="#ff0000">Emergência</option>
-      <option value="#ffa500">Muito Urgente</option>
-      <option value="#ffff00">Urgente</option>
-      <option value="#008000">Pouco Urgente</option>
-      <option value="#0000ff">Não Urgente</option>
+      <option value="#dc3545">Urgente</option>
+      <option value="#fd7e14">Alta</option>
+      <option value="#ffc107">Media</option>
+      <option value="#28a745">Baixa</option>
     </select>
     <button @click="applyColor">Aplicar Cor</button>
   </div>
@@ -349,11 +350,13 @@ export default {
       comentarioSelecionado: null,
       editandoComentarioId: null,
       comentarioEditado: '',
+      profileImage: '',
     };
   },
 
   mounted() {
     this.devName = localStorage.getItem('nomeDesenvolvedor');
+    this.getDevNameComent();
     // console.log("cookie: ", local);
     this.fetchTasks();
     document.addEventListener('click', this.handleClickOutside);
@@ -509,7 +512,10 @@ export default {
         });
       this.devNameComent = response.data.nome;
       this.devIdParticipante = response.data.usuario_id;
-      console.log("devNameComent: ", this.devNameComent);
+      console.log("this.profile: ", response.data.login)
+      this.profileImage = response.data.login.profile_image;
+      console.log("this.profileImageeeeeee: ", this.profileImage);
+      console.log("devNameComenteeeeeeeeeeeeee: ", this.devNameComent);
     },
     async removerAttachment(attachmentId, taskId) {
       if (!confirm("Tem certeza que deseja remover este arquivo??")) return;
@@ -1216,7 +1222,26 @@ abrirJanelaParticipantes(taskId) {
   usuariosNaoParticipantes() {
     const idsParticipantes = this.participantes.map(p => p.usuario.usuario_id);
     return this.listaUsuarios.filter(u => !idsParticipantes.includes(u.usuario.usuario_id));
-  }
+  },
+  profileImage() {
+        console.log("profileImage: ", this.profileImage.conteudo);
+        const image = this.profileImage.conteudo;
+        console.log("conteudo: ", image);
+        if (
+          this.profileImage
+        ) {
+          const bytes = new Uint8Array(this.profileImage.conteudo.data);
+          console.log("bytes: ", bytes);
+          const blob = new Blob([bytes], { type: this.profileImage.tipo });
+          console.log("blob: ", blob);
+          return URL.createObjectURL(blob);
+          // console.log("ẗhis.profileImage: ", this.profileImage);
+        }
+
+        // imagem padrão
+        // return 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg';
+      },
+      
 }
 };
 </script>
@@ -1272,7 +1297,7 @@ body {
   z-index: 1;
   flex-shrink: 0;
   flex-grow: 0;
-  
+  max-height: 60px;
 }
 
 .card-bar {
@@ -1304,22 +1329,64 @@ body {
 }
 
 .color-picker {
+  display: flex;
   position: fixed;
   background-color: #fff;
   padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
+  gap: 10px;
 }
+
+/* .color-picker button {
+  background-color: #555;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+} */
+
+/* .color-picker button:hover {
+  background-color: #555;
+} */
 .card-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-left: 10px;
 }
+
+.task-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;       /* máximo de 2 linhas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  /* color: chartreuse; */
+  word-break: break-word;
+  max-width: 100%; /* ou defina uma largura específica, como 300px */
+}
+
 .dev-circles {
   display: flex;
-  gap: 5px; /* Espaço entre as bolinhas */
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+  gap: 3px;
+  flex-direction: row-reverse;
+  justify-items: start;
+  /* border: 5px solid #000000; */
+  flex-wrap: wrap;
+  max-width: 100px;
+  max-height: 30px;
+  /* z-index: 3000; */
+  /* overflow: auto;
+  overflow-x:visible; */
 }
 
 .dev-circle {
@@ -1531,6 +1598,9 @@ body {
   height: 100px;
   width: 98.5%;
   border-radius: 6px;
+  white-space: pre-wrap; /* Quebra linhas em espaços e quebras de linha */
+  word-wrap: break-word; /* Quebra palavras grandes */
+  overflow-wrap: break-word;
 }
 
 .comentario-container {
@@ -1757,28 +1827,46 @@ body {
 .ql-toolbar.ql-snow .ql-stroke,
 .ql-toolbar.ql-snow .ql-fill,
 .ql-toolbar.ql-snow .ql-fill.ql-invert {
-  stroke: rgb(107, 107, 107) !important;  
+  stroke: rgb(255, 255, 255) !important;  
   /* fill: white !important;     */
 }
 
 .pausada-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7); /* branco translúcido */
-  color: #333;
+  top: 200;
+  left: 100;
+  width: 30%;
+  height: 10%;
+  /* background-color: rgba(255, 255, 255, 0.7); branco translúcido */
+  color: red;
   font-weight: bold;
   font-size: 1.2em;
   display: flex;
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
-  z-index: 2;
+  z-index: 1000;
   border-radius: 8px;
+  margin-top: 5px;
+  margin-left: 210PX;
 }
 
+.pausada-overlay img {
+  width: 20px;
+  height: 20px;
+  margin-right: 13px;
+  margin-bottom: 10px;
+  border-radius: 50%; /* Faz a bolinha redonda */
+  border: 1px solid white; /* Borda vermelha */
+}
+
+.devImg img{
+  /* position:fixed; */
+  /* right: 100; */
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
 /* Telas pequenas (celular) */
 @media (max-width: 710px) {
   .navbar {

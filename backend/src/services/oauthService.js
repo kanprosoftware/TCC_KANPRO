@@ -11,15 +11,15 @@ const transporter = nodemailer.createTransport({
 });
 
 export const handleOAuthCallback = async ({ provider, provider_id, email, displayName }) => {
-  console.log("email", email);
-  console.log("provider", provider);
-  console.log("provider_id", provider_id);
-  console.log("displayName", displayName);
+  // console.log("email", email);
+  // console.log("provider", provider);
+  // console.log("provider_id", provider_id);
+  // console.log("displayName", displayName);
   if (!provider || !provider_id || !email) throw new Error("Dados incompletos para autenticação OAuth");
     //console.log("Dados recebidos:", { provider, providerId, email });
   let login = await prisma.login.findFirst({ where: { email, provider, provider_id } });
-  //console.log("Login encontrado:", login);
-  const isNew = !login;
+  // console.log("Login encontrado:", login);
+  // const isNew = !login;
   if (!login) {
     login = await prisma.login.create({
       data: {
