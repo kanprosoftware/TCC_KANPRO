@@ -122,12 +122,12 @@
 <div v-if="showSugestaoModal" class="modal-overlay">
     <div class="modal">
       <!-- Cabeçalho -->
-      <div class="flex items-center justify-between mb-4">
+      <!-- <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold">Adicionar desenvolvedores</h2>
         <button class="text-gray-500 hover:text-red-600" @click="fecharModal">
           <i class="fas fa-times"></i>
         </button>
-      </div>
+      </div> -->
 
       <!-- Sugestões de Desenvolvedores -->
       <div class="flex items-center gap-2 mb-2">

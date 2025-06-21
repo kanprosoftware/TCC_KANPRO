@@ -457,8 +457,8 @@ export default {
       }
     },
     async uploadFile(files) {
-      console.log("chamou UploadFile");
-      console.log("element: ", this.element.id)
+      // console.log("chamou UploadFile");
+      // console.log("element: ", this.element.id)
       const formData = new FormData();
 
       formData.append("tarefa_id", this.element.id);     // por exemplo, tarefaId = 1
@@ -468,7 +468,7 @@ export default {
       for (const file of files) {
         formData.append("arquivos", file); // "arquivos" é o mesmo nome usado no multer
       }
-      console.log("response files : ");
+      // console.log("response files : ");
 
       try {
         const response = await axios.post(
@@ -498,7 +498,7 @@ export default {
         const response = await axios.get(`http://localhost:3000/todos/listAttachment/${todoId}`, {
           withCredentials: true
         });
-        console.log("response: ", response.data);
+        // console.log("response: ", response.data);
         //const data = await response.json();
         this.attachments = response.data;
         //console.log("comments: ", data);
@@ -512,15 +512,15 @@ export default {
         });
       this.devNameComent = response.data.nome;
       this.devIdParticipante = response.data.usuario_id;
-      console.log("this.profile: ", response.data.login)
+      // console.log("this.profile: ", response.data.login)
       this.profileImage = response.data.login.profile_image;
-      console.log("this.profileImageeeeeee: ", this.profileImage);
-      console.log("devNameComenteeeeeeeeeeeeee: ", this.devNameComent);
+      // console.log("this.profileImageeeeeee: ", this.profileImage);
+      // console.log("devNameComenteeeeeeeeeeeeee: ", this.devNameComent);
     },
     async removerAttachment(attachmentId, taskId) {
       if (!confirm("Tem certeza que deseja remover este arquivo??")) return;
-      console.log("attachmentId: ", attachmentId);
-      console.log("taskId: ", taskId);
+      // console.log("attachmentId: ", attachmentId);
+      // console.log("taskId: ", taskId);
       try {
       const response = await axios.delete('http://localhost:3000/todos/exludeAttachment', {
           data: {
@@ -541,7 +541,7 @@ export default {
         const response = await axios.get(`http://localhost:3000/todos/getComments/${todoId}`, {
           withCredentials: true
         });
-        console.log("response: ", response.data);
+        // console.log("response: ", response.data);
         //const data = await response.json();
         this.comments = response.data;
         //console.log("comments: ", data);
@@ -550,7 +550,7 @@ export default {
       }
     },
     async addComent(taskId, comment) {
-      console.log("comment: ", comment);
+      // console.log("comment: ", comment);
       if (comment.length <= 0 || comment === '<p><br></p>') {
         alert("Por favor, escreva um comentário.");
         return;
@@ -583,7 +583,7 @@ export default {
           }
     },
     editarComentario() {
-      console.log("comentario selecionado: ", this.comentarioSelecionado);
+      // console.log("comentario selecionado: ", this.comentarioSelecionado);
       
       if (!this.comentarioSelecionado) return;
 
@@ -591,7 +591,7 @@ export default {
       this.editandoComentarioId = comentario.comentario_id;
       this.comentarioEditado = comentario.comentario;
 
-      console.log("comentario editado: ", this.comentarioEditado);
+      // console.log("comentario editado: ", this.comentarioEditado);
 
       this.commentMenuVisivel = false;
     },
@@ -600,10 +600,10 @@ export default {
         alert("Por favor, escreva um comentário.");
         return;
       }
-      console.log("comentario editado selecionado: ", this.comentarioSelecionado);
-      console.log("elementeId: ", elementId);
+      // console.log("comentario editado selecionado: ", this.comentarioSelecionado);
+      // console.log("elementeId: ", elementId);
       // if (!this.comentarioSelecionado) return;
-      console.log("this.comentarioEditado", this.comentarioEditado);
+      // console.log("this.comentarioEditado", this.comentarioEditado);
       try {
         const response = await axios.put('http://localhost:3000/todos/editComentTodo', {
               comentario_id: this.comentarioSelecionado.comentario_id,
@@ -616,7 +616,7 @@ export default {
             await this.fetchComments(elementId);
       } catch (error) {
         alert(`Erro: ${error.response.data.error}`);
-        console.log("erro", error);
+        // console.log("erro", error);
       }
       this.editandoComentarioId = null;
       this.comentarioEditado = '';
@@ -626,10 +626,10 @@ export default {
       this.comentarioEditado = '';
     },
     async excluirComentario(elementId) {
-      console.log("comentario editado selecionado: ", this.comentarioSelecionado);
-      console.log("elementeId: ", elementId);
+      // console.log("comentario editado selecionado: ", this.comentarioSelecionado);
+      // console.log("elementeId: ", elementId);
       // if (!this.comentarioSelecionado) return;
-      console.log("this.comentarioEditado", this.comentarioEditado);
+      // console.log("this.comentarioEditado", this.comentarioEditado);
       try {
         await axios.delete('http://localhost:3000/todos/deleteComentTodo', {
           data: {
@@ -651,7 +651,7 @@ export default {
             
       } catch (error) {
         alert(`Erro: ${error.response.data.error}`);
-        console.log("erro", error);
+        // console.log("erro", error);
       }
       // this.editandoComentarioId = null;
       // this.comentarioEditado = '';
@@ -662,7 +662,7 @@ export default {
         const response = await axios.get(`http://localhost:3000/todos/listParticipantes/${taskId}`, {
           withCredentials: true
         });
-        console.log("participantes: ", response.data);
+        // console.log("participantes: ", response.data);
         return this.participantes = response.data;
         // return response.data;
       } catch (error) {
@@ -707,7 +707,7 @@ export default {
       }
     },
     async fecharModal() {
-      console.log("fechar modal");
+      // console.log("fechar modal");
       await this.fetchTasks();
       this.showModal = false;
       
@@ -730,7 +730,7 @@ export default {
         });
 
         const tasks = response.data;
-        console.log("tasks: ", tasks);
+        // console.log("tasks: ", tasks);
         // console.log("tasks: ", tasks);
         this.kanbanLists.forEach(list => (list.items = []));
 
@@ -767,7 +767,7 @@ export default {
             //   console.log("TAREFA NÃO PAUSADA");
             // }
             if (task.pausas.some(pausa => pausa.fimPausa === null)) {
-              console.log('Existe uma pausa ainda em aberto');
+              // console.log('Existe uma pausa ainda em aberto');
               list.items.push({
                 id: task.tarefa_id,
                 title: task.titulo,
@@ -777,7 +777,7 @@ export default {
                 paused: true // Marca a tarefa como pausada
               });
             } else {
-              console.log('Todas as pausas foram finalizadas');
+              // console.log('Todas as pausas foram finalizadas');
               list.items.push({
                 id: task.tarefa_id,
                 title: task.titulo,
@@ -789,9 +789,9 @@ export default {
             }
           }
         });
-        console.log("kanbanLists: ", this.kanbanLists);
+        // console.log("kanbanLists: ", this.kanbanLists);
       } catch (error) {
-        console.error("Erro ao buscar tarefas:", error);
+        // console.error("Erro ao buscar tarefas:", error);
         alert("Faça login para continuar")
         this.$router.push("/login");
       }
@@ -831,10 +831,10 @@ export default {
         withCredentials: true
       });
 
-      console.log("responseName: ", responseName.data.nome);
+      // console.log("responseName: ", responseName.data.nome);
 
       const novaTarefa = response.data;
-      console.log("novaTarefa: ", novaTarefa);
+      // console.log("novaTarefa: ", novaTarefa);
       this.kanbanLists[index].items.unshift({
         id: novaTarefa.tarefa_id,
         title: novaTarefa.titulo,
@@ -867,7 +867,7 @@ async excluirTarefa(card) {
   }
 },
     async updateDescription(taskId, description) {
-      console.log("taskId: ", taskId);
+      // console.log("taskId: ", taskId);
       // console.log("description: ", description);
           try {
             const response = await axios.put('http://localhost:3000/todos/description/:id', {
@@ -881,17 +881,17 @@ async excluirTarefa(card) {
             setTimeout(() => {
               this.descricaoAtualizada = false;
             }, 2000);
-            console.log("Descrição atualizada com sucesso:", response.data);
+            // console.log("Descrição atualizada com sucesso:", response.data);
           } catch (error) {
             //alert()
-            console.log("error: ", error);
+            // console.log("error: ", error);
             alert(`Erro: ${error.response.data.error}`);
             console.error("Erro ao atualizar descrição:", error);
           }
     },
     async updateTitle(taskId, title) {
-      console.log("taskId: ", taskId);
-      console.log("description: ", title);
+      // console.log("taskId: ", taskId);
+      // console.log("description: ", title);
           try {
             const response = await axios.put('http://localhost:3000/todos/title/', {
               tarefa_id: taskId,
@@ -905,12 +905,12 @@ async excluirTarefa(card) {
             this.element.title = response.data.titulo;
               this.editandoTitulo = false;
             // }, 2000);
-            console.log("Titulo atualizado com sucesso:", response.data);
+            // console.log("Titulo atualizado com sucesso:", response.data);
           } catch (error) {
             //alert()
-            console.log("error: ", error);
+            // console.log("error: ", error);
             alert(`Erro: ${error.response.data.error}`);
-            console.error("Erro ao atualizar titulo:", error);
+            // console.error("Erro ao atualizar titulo:", error);
           }
     },
     openColorPicker(event, card) {
@@ -1002,15 +1002,15 @@ async excluirTarefa(card) {
   const fromList = this.kanbanLists.find(list => list.name === fromListName);
   const toList = this.kanbanLists.find(list => list.name === toListName);
 
-  console.log("fromList: ", fromList);
-  console.log("toList: ", toList);
+  // console.log("fromList: ", fromList);
+  // console.log("toList: ", toList);
 
   if (toList && fromList) {
     //console.log("entrou no if");
     //console.log("task: ", task.__draggable_context.element.id);
     // Remover da lista errada
     const index = toList.items.findIndex(item => item.id === task.__draggable_context.element.id);
-    console.log("index: ", index);
+    // console.log("index: ", index);
     if (index !== -1) {
       const [removedTask] = toList.items.splice(index, 1); // remove do destino
       fromList.items.push(removedTask); // volta para origem
@@ -1029,12 +1029,12 @@ async excluirTarefa(card) {
       const projectId = this.$route.params.id;
       try {
         const error = await this.updateTaskStatus(itemId, listNamed, projectId, this.selectedCard.__draggable_context.element);
-        console.log("try: ");
+        // console.log("try: ");
       } catch (error) {
         console.error("catch: ", error);
         // console.error("Erro ao atualizar status da tarefa:", error);
         // alert("Erro ao atualizar status da tarefa. Tente novamente.");
-        console.log("error: ", error);
+        // console.log("error: ", error);
         alert(`${error}`);
         this.moveTaskBackOnError(this.selectedCard, listNamePrevious, listNamed);
       }
@@ -1055,7 +1055,7 @@ async excluirTarefa(card) {
   }
 
   if (this.showContextMenu && contextMenu && !contextMenu.contains(event.target)) {
-    console.log("chamou o if do contextMenu");
+    // console.log("chamou o if do contextMenu");
     this.showContextMenu = false;
   }
 
@@ -1102,14 +1102,14 @@ abrirJanelaParticipantes(taskId) {
           withCredentials: true
         });
       this.listaUsuarios = response.data;
-      console.log("listaUsuarios: ", this.listaUsuarios);
+      // console.log("listaUsuarios: ", this.listaUsuarios);
     } catch (error) {
       console.error('Erro ao buscar participantes:', error);
     }
   },
 
   async pauseTask(taskId) {
-    console.log("taskId: ", taskId);
+    // console.log("taskId: ", taskId);
     if (!confirm("Tem certeza que deseja pausar esta tarefa?")) return;
     try {
       const response = await axios.post('http://localhost:3000/todos/pauseTask', {
@@ -1118,16 +1118,16 @@ abrirJanelaParticipantes(taskId) {
       }, {
         withCredentials: true
       });
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       this.fetchTasks();
     } catch (error) {
-      console.error('Erro ao pausar tarefa:', error);
+      // console.error('Erro ao pausar tarefa:', error);
       alert(`Erro: ${error.response.data.error}`);
     }
   },
 
   async resumeTask(taskId) {
-    console.log("taskId: ", taskId);
+    // console.log("taskId: ", taskId);
     // if (!confirm("Tem certeza que deseja pausar esta tarefa?")) return;
     try {
       const response = await axios.put('http://localhost:3000/todos/continueTask', {
@@ -1136,7 +1136,7 @@ abrirJanelaParticipantes(taskId) {
       }, {
         withCredentials: true
       });
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       // element.paused = true; // Atualiza o estado local
       // console.log("this.element: ", this.element.id);
       // alert('Tarefa pausada com sucesso!');
@@ -1162,13 +1162,13 @@ abrirJanelaParticipantes(taskId) {
       const response = await axios.put('http://localhost:3000/todos/addParticipantes', payload, {
         withCredentials: true
       });
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       alert('Participantes adicionados com sucesso!');
       this.janelaParticipantesAberta = false;
       this.usuariosSelecionados = [];
       this.getParticipantes(taskId); // Atualiza a lista visível
     } catch (error) {
-      console.error('Erro ao adicionar participantes:', error);
+      // console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
       this.janelaParticipantesAberta = false;
     }
@@ -1179,8 +1179,8 @@ abrirJanelaParticipantes(taskId) {
     //   return
     // }
     if (!confirm("Tem certeza que deseja remover este participante?")) return;
-    console.log("usuario_id: ", usuario_id);
-    console.log("tarefa_id: ", tarefa_id);
+    // console.log("usuario_id: ", usuario_id);
+    // console.log("tarefa_id: ", tarefa_id);
     try {
       const payload = {
         projeto_id: this.$route.params.id,
@@ -1192,7 +1192,7 @@ abrirJanelaParticipantes(taskId) {
         data: payload,
         withCredentials: true
       });
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       alert('Participante removido com sucesso!');
       // this.janelaParticipantesAberta = false;
       // this.usuariosSelecionados = [];
@@ -1216,7 +1216,7 @@ abrirJanelaParticipantes(taskId) {
       ...list,
       items: list.items.filter(task => task.title.toLowerCase().includes(query))
     }));
-    console.log("filtered: ", filtered);
+    // console.log("filtered: ", filtered);
     return filtered;
   },
   usuariosNaoParticipantes() {
@@ -1224,16 +1224,16 @@ abrirJanelaParticipantes(taskId) {
     return this.listaUsuarios.filter(u => !idsParticipantes.includes(u.usuario.usuario_id));
   },
   profileImage() {
-        console.log("profileImage: ", this.profileImage.conteudo);
+        // console.log("profileImage: ", this.profileImage.conteudo);
         const image = this.profileImage.conteudo;
-        console.log("conteudo: ", image);
+        // console.log("conteudo: ", image);
         if (
           this.profileImage
         ) {
           const bytes = new Uint8Array(this.profileImage.conteudo.data);
-          console.log("bytes: ", bytes);
+          // console.log("bytes: ", bytes);
           const blob = new Blob([bytes], { type: this.profileImage.tipo });
-          console.log("blob: ", blob);
+          // console.log("blob: ", blob);
           return URL.createObjectURL(blob);
           // console.log("ẗhis.profileImage: ", this.profileImage);
         }

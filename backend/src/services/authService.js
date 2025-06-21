@@ -30,6 +30,12 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
   let user;
 
   if (!serial) {
+    const existEmail = await prisma.login.findUnique({
+      where: { email },
+    });
+    if (existEmail) {
+      throw new Error("Email já cadastrado");
+    }
     login = await prisma.login.create({
       data: {
         email,

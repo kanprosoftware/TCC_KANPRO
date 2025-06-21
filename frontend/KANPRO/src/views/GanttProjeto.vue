@@ -44,61 +44,75 @@ onMounted( async () => {
     // console.log('Tarefas recebidas:', tarefas.value);
     // Transforma os campos de data em objetos Date
     tarefas.value = [] // Limpa antes
+    console.log("tarefas.value: ", response.data);
+    if (response.data.length === 0) {
+      console.log("tarefas.value.length: ", response.data.length);
+      const hoje = new Date()
+      hoje.setHours(0, 0, 0, 0)
 
-  response.data.forEach(t => {
-    const startOriginal = new Date(t.createdAt)
-    const endOriginal = new Date(t.concludeAt ?? new Date())
-    const pausasOrdenadas = t.pausas.sort((a, b) => new Date(a.inicioPausa) - new Date(b.inicioPausa))
+      tarefas.value = [] // deixa vazio mesmo
 
-    if (pausasOrdenadas.length === 0) {
-      tarefas.value.push({
-        id: t.tarefa_id,
-        name: t.titulo,
-        start: startOriginal,
-        end: endOriginal,
-        colorBar: t.colorBar,
-      })
-      return
-    }
+      let startDate = new Date(hoje)
+      console.log("startDate: ", startDate);
+      let endDate = new Date(hoje)
+      endDate.setDate(endDate.getDate() + 34) // 5 semanas = 35 dias
+      
+    } else { 
+        response.data.forEach(t => {
+        const startOriginal = new Date(t.doing)
+        const endOriginal = new Date(t.concludeAt ?? new Date())
+        const pausasOrdenadas = t.pausas.sort((a, b) => new Date(a.inicioPausa) - new Date(b.inicioPausa))
 
-    // Parte 1: início até primeira pausa
-    tarefas.value.push({
-      id: t.tarefa_id,
-      name: t.titulo ,
-      start: startOriginal,
-      end: new Date(pausasOrdenadas[0].inicioPausa),
-      colorBar: t.colorBar,
-    })
+        if (pausasOrdenadas.length === 0) {
+          tarefas.value.push({
+            id: t.tarefa_id,
+            name: t.titulo,
+            start: startOriginal,
+            end: endOriginal,
+            colorBar: t.colorBar,
+          })
+          return
+        }
 
-    // Entre pausas
-    for (let i = 0; i < pausasOrdenadas.length - 1; i++) {
-      const fimAtual = pausasOrdenadas[i].fimPausa
-      const inicioProx = pausasOrdenadas[i + 1].inicioPausa
-
-      if (fimAtual && inicioProx) {
+        // Parte 1: início até primeira pausa
         tarefas.value.push({
           id: t.tarefa_id,
-          name: t.titulo,
-          start: new Date(fimAtual),
-          end: new Date(inicioProx),
+          name: t.titulo ,
+          start: startOriginal,
+          end: new Date(pausasOrdenadas[0].inicioPausa),
           colorBar: t.colorBar,
         })
-      }
-    }
 
-    // Último trecho: fim da última pausa até concludeAt
-    const ultimaPausa = pausasOrdenadas[pausasOrdenadas.length - 1]
-    if (ultimaPausa.fimPausa) {
-      tarefas.value.push({
-        id: t.tarefa_id,
-        name: t.titulo,
-        start: new Date(ultimaPausa.fimPausa),
-        end: endOriginal,
-        colorBar: t.colorBar,
+        // Entre pausas
+        for (let i = 0; i < pausasOrdenadas.length - 1; i++) {
+          const fimAtual = pausasOrdenadas[i].fimPausa
+          const inicioProx = pausasOrdenadas[i + 1].inicioPausa
+
+          if (fimAtual && inicioProx) {
+            tarefas.value.push({
+              id: t.tarefa_id,
+              name: t.titulo,
+              start: new Date(fimAtual),
+              end: new Date(inicioProx),
+              colorBar: t.colorBar,
+            })
+          }
+        }
+
+        // Último trecho: fim da última pausa até concludeAt
+        const ultimaPausa = pausasOrdenadas[pausasOrdenadas.length - 1]
+        if (ultimaPausa.fimPausa) {
+          tarefas.value.push({
+            id: t.tarefa_id,
+            name: t.titulo,
+            start: new Date(ultimaPausa.fimPausa),
+            end: endOriginal,
+            colorBar: t.colorBar,
+          })
+        }
       })
-    }
-  })
-    console.log("tarefas: ", tarefas.value);
+      }
+    // console.log("tarefas: ", tarefas.value);
   } catch (error) {
     console.error('Erro ao buscar tarefas:', error)
     return
@@ -110,25 +124,36 @@ onMounted( async () => {
   const taskHeight = 30
   const margin = { top: 60, right: 20, bottom: 40, left: 0 }
   const tasks = tarefas.value
+
+  
+  let startDate, endDate;
   
   // Determina os limites com base nas tarefas
-  const taskStart = d3.min(tasks, d => d.start.toISOString().split('T')[0])
+  if (tarefas.value.length === 0) {
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    startDate = new Date(hoje)
+    endDate = new Date(hoje)
+    endDate.setDate(endDate.getDate() + 28)
+  } else { 
+    const taskStart = d3.min(tasks, d => d.start.toISOString().split('T')[0])
   //const dateString = taskStart.toISOString().split('T')[0];
-  console.log("taskStart: ", taskStart);
+  // console.log("taskStart: ", taskStart);
   const taskEnd = d3.max(tasks, d => d.end.toISOString().split('T')[0])
   
-  console.log("taskEnd: ", taskEnd);
+  // console.log("taskEnd: ", taskEnd);
 
   // Garante que a contagem de semanas comece no início da primeira tarefa
-  const startDate = new Date(taskStart)
-  console.log("statDate: ", startDate);
-  const endDate = new Date(taskEnd)
-  console.log("calcula: ", (endDate - startDate));
+  startDate = new Date(taskStart)
+  // console.log("statDate: ", startDate);
+  endDate = new Date(taskEnd)
+  // console.log("calcula: ", (endDate - startDate));
   if ((endDate - startDate) < 1814400000) {
-     endDate.setDate(endDate.getDate() + (21 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
+     endDate.setDate(endDate.getDate() + (28 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
   } else {
-    endDate.setDate(endDate.getDate() + (7 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
+    endDate.setDate(endDate.getDate() + (14 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
   }
+}
 
   const totalDays = d3.timeDay.count(startDate, endDate)
   const width = margin.left + totalDays * dayWidth + margin.right

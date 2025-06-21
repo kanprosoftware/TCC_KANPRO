@@ -33,6 +33,16 @@
         <div v-else-if="etapa === 2" class="form">
           <label>Selecione suas habilidades:</label>
           <div class="tecnologias-grid">
+            <div class="tecnologia-item">
+              <label>
+                <input
+                  type="checkbox"
+                  value="Sem habilidades"
+                  v-model="habilidades"
+                />
+                Sem habilidades
+              </label>
+            </div>
             <div
               v-for="(tecnologia, index) in tecnologias"
               :key="index"
@@ -46,6 +56,7 @@
                 />
                 {{ tecnologia.descricao }}
               </label>
+              
             </div>
           </div>
           <button
@@ -80,11 +91,11 @@
 mounted() {
   //const token = localStorage.getItem('jwtToken');
   const token = this.$route.query.token || localStorage.getItem('jwtToken'); // Pega o token da URL ou do localStorage
-  console.log("token: ", token);
+  // console.log("token: ", token);
   if (token) {
     //console.log("token: ", token);
     const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log("payload: ", payload);
+    // console.log("payload: ", payload);
     if (payload.cadastroIncompleto) {
       // Fluxo OAuth ainda incompleto
       //console.log("payload: ", payload);
@@ -111,7 +122,7 @@ created() {
   })
     .then(res => res.json())
     .then(data => {
-      console.log("Primeiro usuário: ", data);
+      // console.log("Primeiro usuário: ", data);
       this.isPrimeiroUsuario = data;
     })
     .catch(err => {
@@ -120,7 +131,7 @@ created() {
 },
 methods: {
   avancarEtapa() {
-    console.log("primeiro usuario: ", this.isPrimeiroUsuario);
+    // console.log("primeiro usuario: ", this.isPrimeiroUsuario);
     if (!this.serial && (this.isPrimeiroUsuario === true)) {
       alert("Informe o serial de ativacao!");
       return;
@@ -159,6 +170,11 @@ methods: {
 
     } else {
       // Cadastro tradicional
+      // console.log("this.habilidades: ", this.habilidades);
+      if (this.habilidades.includes('Sem habilidades')) {
+        this.habilidades = [];
+      }
+      // console.log("this.habilidades: ", this.habilidades);
       dados = {
         name: this.nome,
         email: this.email,
@@ -179,7 +195,7 @@ methods: {
         },
         body: JSON.stringify(dados)
       });
-
+      //console.log("Response error: ", res);
       if (!res.ok) throw new Error(await res.text());
 
       alert('Cadastro concluído! \nUm email de verificação foi enviado.');
@@ -187,7 +203,8 @@ methods: {
       this.etapa = 3;
       this.$router.push('/login');
     } catch (e) {
-      alert('Erro: ' + e.message);
+      //console.log("Mensage erro: ", e);
+      alert(e.message);
     } finally {
       this.cadastrando = false;
     }
