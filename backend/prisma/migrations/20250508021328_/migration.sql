@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "comentario" ADD COLUMN     "data_hora" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
