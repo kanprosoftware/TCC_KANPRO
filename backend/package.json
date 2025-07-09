@@ -15,7 +15,7 @@
   },
   "keywords": [],
   "author": "Canrobert Acosta Brasil Junior",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
