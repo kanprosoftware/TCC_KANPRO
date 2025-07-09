@@ -6,7 +6,6 @@
       <form class="form" @submit.prevent="login">
         <div class="form">
           <input type="email" v-model="email" placeholder="Email" class="input" required/>
-          <!-- <input type="password" v-model="password" placeholder="Senha" class="input" /> -->
           <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Senha" class="input password-input" required/>
           <div class="password-toggle" @click="togglePasswordVisibility">
               <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
@@ -119,12 +118,10 @@ export default {
         if (contentType && contentType.includes('application/json')) {
           return response.json();
         } else {
-          // Se o servidor não retorna JSON, ainda assim redireciona
           return {};
         }
       })
       .then(() => {
-        // ✅ Redirecionar após sucesso
         window.location.href = 'http://localhost:5173/projetos';
       })
       .catch(error => {
@@ -142,7 +139,7 @@ export default {
     },
     handleEsc(event) {
       if (event.key === 'Escape') {
-        this.closeModal(); // ou qualquer outra função
+        this.closeModal(); 
       }
     },
     async forgotPassword() {
@@ -173,8 +170,6 @@ export default {
       }
     },
     register() {
-      // console.log("Indo para tela de cadastro...");
-      // // this.$router.push('/register');
       window.location.href = "http://localhost:5173/registro";
     },
     loginWith(provider) {
@@ -185,12 +180,11 @@ export default {
     },
     handleEnter(event) {
       if (event.key === 'Escape') {
-        this.fecharModal(); // ou qualquer outra função
+        this.fecharModal(); 
       }
     },
   },
   mounted() {
-    //console.log('componente carregado');
 
     const params = new URLSearchParams(window.location.search);
     const erro = params.get('erro');
@@ -226,7 +220,7 @@ export default {
 }
 
 .password-toggle:hover i {
-  color: #808080; /* Cor do ícone quando o mouse passa sobre */
+  color: #808080; 
 }
 
 .login-card {

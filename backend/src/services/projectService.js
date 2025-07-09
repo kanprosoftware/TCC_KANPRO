@@ -1,7 +1,6 @@
 import prisma from "../models/prismaClient.js";
 
 const getTecnologias = async (projectId) => {
-    //console.log("getTecnologias.projectId: ", projectId);
     const tecproject = await prisma.projetoTecnologia.findMany ({
         where: {
             projeto_id: parseInt(projectId),
@@ -18,12 +17,12 @@ const getTecnologias = async (projectId) => {
             },
         },
     });
-    //console.log("tecproject: ", tecproject[0].projeto.tecnologias);
+
     return tecproject[0].projeto.tecnologias;
 }
 
 export const getProjectsByDevId = async (devId) => {
-    //console.log("CHAMOU O SERVICE - devId");
+
     const projects = await prisma.projetoUsuario.findMany({
         where: { usuario_id: parseInt(devId), owner: true },
         include: {
@@ -43,13 +42,11 @@ export const getProjectsByDevId = async (devId) => {
             },
         },
     });
-    //console.log("projects: ", projects);
+
     return projects;
 }
 
 export const getProjectsTeamByDevId = async (devId) => {
-    //console.log("CHAMOU O SERVICE - devId");
-    //console.log("CHAMOU O SERVICE - devId");
     const projects = await prisma.projetoUsuario.findMany({
         where: { usuario_id: parseInt(devId), owner: false },
         include: {
@@ -70,13 +67,10 @@ export const getProjectsTeamByDevId = async (devId) => {
         },
     });
 
-    //console.log("projects: ", projects);
-
     return projects;
 }
 
 export const getProjects = async () => {
-    //console.log("Chamou sevice.getProjects");
     const projects = await prisma.projeto.findMany({
         orderBy: {
             createdAt: "desc",
@@ -87,8 +81,9 @@ export const getProjects = async () => {
         },
     });
 
-    return project;
+    return projects;
 }
+
 export const getProjectById = async (projectId) => {
     const project = await prisma.projeto.findUnique({
         where: { projeto_id: parseInt(projectId)},
@@ -104,7 +99,6 @@ export const getProjectById = async (projectId) => {
     return project;
 }
 export const createProject = async (projectData) => {
-    //console.log("projectData: ", projectData);
     const project = await prisma.projeto.create({
         data: {
             nome: projectData.nome,
@@ -121,11 +115,10 @@ export const createProject = async (projectData) => {
     });
 
     const tecnologiasPromises = projectData.tecnologias.map(async (tecnologia) => {
-        //console.log("tecnologia: ", tecnologia);
         const tecnologiaDb = await prisma.tecnologia.findMany({
             where: { descricao: tecnologia },
         });
-        //console.log("tecnologiaDb", tecnologiaDb[0].tecnologia_id);
+
         return prisma.projetoTecnologia.create({
             data: {
                 projeto_id: project.projeto_id,
@@ -138,7 +131,6 @@ export const createProject = async (projectData) => {
 }
 
 export const addParticipantes = async (addData) => {
-    // console.log("addData: ", addData);
     const projetoUsuario = await prisma.projetoUsuario.createMany({
         data: addData.participantesIds.map(id => ({
             usuario_id: id,
@@ -158,7 +150,6 @@ export const getParticipantes = async (projectId) => {
 }
 
 export const removeParticipante = async (data) => {
-    // console.log("data: ", data);
     const projetoUsuario = await prisma.projetoUsuario.delete({
         where: { 
             projeto_id: parseInt(data.projeto_id),
@@ -208,12 +199,8 @@ export const detailsProjectById = async (projectData) => {
 }
 
 export const devSugestion = async (projectId, owner_id) => {
-    //console.log("chamou o sercice");
-    //console.log("projectId: ", projectId);
     const tecsProject = await getTecnologias(parseInt(projectId));
-    //console.log("tecsProject: ", tecsProject);
     const tecs = tecsProject.map(tp => tp.tecnologia_id);
-    //console.log("tecs: ", tecs);
     const sujestionDev = await prisma.habilidadeUsuario.findMany({
         where: {
             tecnologia_id: {
@@ -221,6 +208,11 @@ export const devSugestion = async (projectId, owner_id) => {
             },
             usuario_id: {
                 not: { equals: owner_id }
+            },
+            usuario: {
+                login: {
+                    ativo: true
+                }
             }
         },
         distinct: ['usuario_id'],
@@ -229,25 +221,27 @@ export const devSugestion = async (projectId, owner_id) => {
         },
         orderBy: {
             usuario: {
-            nome: 'asc' // ou 'desc'
+            nome: 'asc' 
             }
         }
     });
-    //console.log("sugetionDev: ", sujestionDev);
     const devs = sujestionDev.map(d => ({
         usuario_id: d.usuario.usuario_id,
         nome: d.usuario.nome
     }));
-    //console.log("devs: ", devs);
+
     const remmantDevs = await prisma.usuario.findMany({
         where: {
             usuario_id: {
                 notIn: devs.map(dev => dev.usuario_id),
                 not: { equals: owner_id }
             },
+            login: {
+                ativo: true
+            }
         },
     });
-    //console.log("remmantDevs: ", remmantDevs);
+
     return {
         sugestaoDevs: devs,
         desenvolvedoresRestantes: remmantDevs
@@ -279,14 +273,13 @@ export const updateDescription = async (data) => {
 }
 
 export const updateTecnologis = async (data) => {
-    // console.log("data: ", data);
+
     await prisma.projetoTecnologia.deleteMany({
     where: {
         projeto_id: parseInt(data.projeto_id),
     },
     });
 
-    // Em seguida, cria as novas associações
     return await prisma.projetoTecnologia.createMany({
         data: data.tecnologias.map(tecnologia_id => ({
             projeto_id: parseInt(data.projeto_id),
@@ -296,7 +289,6 @@ export const updateTecnologis = async (data) => {
 }
 
 export const addAttachment = async (data) => {
-    // console.log("data: ", data);
     const arquivosCriados = await Promise.all(
       data.arquivos.map(arqs =>
         prisma.anexoProjeto.create({

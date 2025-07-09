@@ -11,7 +11,6 @@ export default function (passport) {
     callbackURL: `${process.env.BASE_URL}/auth/github/callback`,
     scope: ['user:email'],
   }, async (accessToken, refreshToken, profile, done) => {
-    // console.log("profile: ", profile);
     try {
       const result = await handleOAuthCallback({
         provider: 'github',

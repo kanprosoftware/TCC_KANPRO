@@ -8,8 +8,8 @@ export default function(passport) {
   passport.use(new MicrosoftStrategy({
     clientID: process.env.MICROSOFT_CLIENT_ID,
     clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-    callbackURL: `${process.env.BASE_URL}/auth/microsoft/callback`, // Ex: http://localhost:3000/auth/microsoft/callback
-    scope: ['user.read'], // ou ['openid', 'profile', 'email']
+    callbackURL: `${process.env.BASE_URL}/auth/microsoft/callback`,
+    scope: ['user.read'],
     tenant: 'common',
   }, async (accessToken, refreshToken, profile, done) => {
       try {

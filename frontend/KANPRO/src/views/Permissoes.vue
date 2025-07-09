@@ -1,7 +1,6 @@
 <template>
   <Navbar :search="searchQuery" @update:search="searchQuery = $event" @go-home="goToHome" />
     <div class="page-title">
-        <!-- <h1 class="name-project" v-if="nameProject()">{{this.namedProject}}</h1> -->
         <h1 style="color: white">Gerenciar Permissões</h1>
     </div>
   <div class="profile-container">
@@ -67,10 +66,8 @@ export default {
     },
     selecionarUsuario(usuario) {
         if (this.usuarioSelecionado?.usuario?.usuario_id === usuario.usuario.usuario_id) {
-            // Se já está selecionado, desseleciona (fecha o box)
             this.usuarioSelecionado = null;
         } else {
-            // Seleciona um novo usuário (abre o box)
             this.usuarioSelecionado = JSON.parse(JSON.stringify(usuario));
         }
     },
@@ -103,7 +100,6 @@ export default {
       }
     },
     formatarPermissao(permissao) {
-      // Converte camelCase para algo mais legível: ex: acessoFinanceiro -> Acesso Financeiro
       return permissao.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     }
   },
@@ -121,7 +117,6 @@ export default {
 .page-title {
   position: flex;
   text-align: center;
-  /* align-items: center; */
   margin-top: -80px;
 }
 
@@ -141,10 +136,12 @@ export default {
   text-align: center;
   width: 100%;
   max-width: 600px;
+  height: 79%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -150px;
+  margin-top: -70px;
+  overflow: auto;
 }
 
 .user-item {

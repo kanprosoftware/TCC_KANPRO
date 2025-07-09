@@ -3,7 +3,6 @@
       <div class="cadastro-card">
         <h1 class="title">Cadastro</h1>
   
-        <!-- Etapa 1 -->
         <form v-if="etapa === 1" class="form" @submit.prevent="avancarEtapa">
           <input v-model="nome" placeholder="Nome" class="input" />
           <input v-model="email" type="text" placeholder="Email" class="input" />
@@ -29,7 +28,6 @@
           <button type="submit" class="botao">Próximo</button>
         </form>
   
-        <!-- Etapa 2 -->
         <div v-else-if="etapa === 2" class="form">
           <label>Selecione suas habilidades:</label>
           <div class="tecnologias-grid">
@@ -76,7 +74,7 @@
     data() {
   return {
     etapa: 1,
-    isOAuth: false, // indica se veio do OAuth
+    isOAuth: false, 
     nome: '',
     email: '',
     senha: '',
@@ -89,16 +87,10 @@
   };
 },
 mounted() {
-  //const token = localStorage.getItem('jwtToken');
-  const token = this.$route.query.token || localStorage.getItem('jwtToken'); // Pega o token da URL ou do localStorage
-  // console.log("token: ", token);
+  const token = this.$route.query.token || localStorage.getItem('jwtToken'); 
   if (token) {
-    //console.log("token: ", token);
     const payload = JSON.parse(atob(token.split('.')[1]));
-    // console.log("payload: ", payload);
     if (payload.cadastroIncompleto) {
-      // Fluxo OAuth ainda incompleto
-      //console.log("payload: ", payload);
       this.isOAuth = true;
       this.jwtToken = token;
       this.etapa = 2;
@@ -107,7 +99,6 @@ mounted() {
     }
   }
 
-  // Carrega as tecnologias
   fetch('http://localhost:3000/tecnologys/listTecnologys')
     .then(res => res.json())
     .then(data => {
@@ -115,14 +106,12 @@ mounted() {
     });
 },
 created() {
-  // Verifica se é o primeiro usuário
   fetch("http://localhost:3000/auth/primeiroUser", {
     method: "GET",
     credentials: "include"
   })
     .then(res => res.json())
     .then(data => {
-      // console.log("Primeiro usuário: ", data);
       this.isPrimeiroUsuario = data;
     })
     .catch(err => {
@@ -131,7 +120,6 @@ created() {
 },
 methods: {
   avancarEtapa() {
-    // console.log("primeiro usuario: ", this.isPrimeiroUsuario);
     if (!this.serial && (this.isPrimeiroUsuario === true)) {
       alert("Informe o serial de ativacao!");
       return;
@@ -164,17 +152,13 @@ methods: {
     let endpoint;
 
     if (this.isOAuth) {
-      // Completa o cadastro com habilidades
       dados = { habilidades: this.habilidades };
       endpoint = 'http://localhost:3000/auth/complete-profile';
 
     } else {
-      // Cadastro tradicional
-      // console.log("this.habilidades: ", this.habilidades);
       if (this.habilidades.includes('Sem habilidades')) {
         this.habilidades = [];
       }
-      // console.log("this.habilidades: ", this.habilidades);
       dados = {
         name: this.nome,
         email: this.email,
@@ -195,7 +179,6 @@ methods: {
         },
         body: JSON.stringify(dados)
       });
-      //console.log("Response error: ", res);
       if (!res.ok) throw new Error(await res.text());
 
       alert('Cadastro concluído! \nUm email de verificação foi enviado.');
@@ -203,7 +186,6 @@ methods: {
       this.etapa = 3;
       this.$router.push('/login');
     } catch (e) {
-      //console.log("Mensage erro: ", e);
       alert(e.message);
     } finally {
       this.cadastrando = false;
@@ -217,10 +199,10 @@ methods: {
   .cadastro-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alinha no topo */
-    min-height: 100vh; /* Permite scroll se o conteúdo crescer */
+    align-items: flex-start; 
+    min-height: 100vh; 
     background-color: #1f1f1f;
-    padding-top: 40px; /* Espaço para não cortar no topo */
+    padding-top: 40px; 
     padding-bottom: 40px; 
   }
 

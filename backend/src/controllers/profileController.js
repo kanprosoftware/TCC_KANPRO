@@ -1,7 +1,6 @@
 import { getProfile, includeUpdateFoto, updateEmail, updateHabilidades, updateName, updateSenha } from '../services/profileService.js';
 
 export const profile = async (req, res) => {
-    //console.log("CHAMOU O CONTROLLER - devId", req.desenvolvedorId);
     const devId = req.usuario_id;
     try {
         const profile = await getProfile(devId);
@@ -25,10 +24,6 @@ export const updateProfileName = async (req, res) => {
 }
 
 export const updateProfileEmail = async (req, res) => {
-    // console.log("--------------------------------------------------")
-    // console.log("REQUEST: ", req.body);
-    // console.log("REQUEST: ", req);
-    // console.log("--------------------------------------------------")
     const dataNewEmail = {
         usuario_id: req.usuario_id,
         email: req.body.emailNovo,
@@ -43,17 +38,11 @@ export const updateProfileEmail = async (req, res) => {
 }
 
 export const updateProfileSenha = async (req, res) => {
-    // console.log("--------------------------------------------------")
-    // console.log("REQUEST: ", req.body);
-    // console.log("REQUEST: ", req);
-    // console.log("--------------------------------------------------")
-
     const dataNewSenha = {
         usuario_id: req.usuario_id,
         senhaAtual: req.body.senhaAtual,
         novaSenha: req.body.senhaNova,
     }
-    // console.log("dataNewSenha: ", dataNewSenha);
     try {
         const newSenha = await updateSenha(dataNewSenha);
         res.status(200).json(newSenha);
@@ -63,8 +52,6 @@ export const updateProfileSenha = async (req, res) => {
 }
 
 export const updateProfileHabilidades = async (req, res) => {
-    console.log("Chamou o controller updateProfileHabilidades");
-    console.log("req.body: ", req.body);
     const dataNewHabilidades = {
         habilidades: req.body.habilidades,
         usuario_id: req.usuario_id,
@@ -78,8 +65,6 @@ export const updateProfileHabilidades = async (req, res) => {
 }
 
 export const includeUpdateProfileFoto = async (req, res) => { 
-    console.log("req.file: ", req.files);
-    console.log("req.usuario_id: ", req.usuario_id);
     const dataNewFoto = {
         ...req.body,
         usuario_id: req.usuario_id,
@@ -91,7 +76,6 @@ export const includeUpdateProfileFoto = async (req, res) => {
             conteudo: file.buffer,
         }));
     }
-    console.log("dataNewFoto: ", dataNewFoto);
     try {
         const newFoto = await includeUpdateFoto(dataNewFoto);
         res.status(200).json(newFoto);

@@ -1,17 +1,14 @@
 <template>
     <Navbar :search="searchQuery" @update:search="searchQuery = $event" @go-home="goToHome" :profileImageUpdated="profileImageUpdated"/>
     <div class="page-title">
-        <!-- <h1 class="name-project" v-if="nameProject()">{{this.namedProject}}</h1> -->
         <h1>Perfil do usuário {{ this.name }}</h1>
     </div>
     <div class="profile-container">
       <div class="profile-card">
-        <!-- <h1 class="title">Perfil</h1> -->
           <img :src="profileImage || 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg'" class="logo" />
           <button class="edit-profile-image" @click="openFileDialog" title="Editar Imagem de Perfil">
                     🖉
                 </button>
-          <!-- input invisível -->
     <input
       type="file"
       ref="fileInput"
@@ -21,7 +18,6 @@
     />
       <h1 class="title">Perfil</h1>
         <div class="form">
-          <!-- NOME -->
           <div class="form-group">
                 <label for="nomeProjeto">Nome:</label>
 
@@ -47,7 +43,6 @@
                     </div>
                 </div>
             </div>
-            <!-- EMAIL -->
           <div class="form-group">
                 <label for="descricaoProjeto">Email:</label>
 
@@ -74,7 +69,6 @@
                     </div>
                 </div>
             </div>
-            <!-- SENHA -->
             <div class="form-group">
                 <label for="descricaoProjeto">Senha:</label>
 
@@ -87,7 +81,6 @@
                     class="input"
                     v-if="!editandoSenha"
                     />
-                    <!--  -->
                     <div class="form-group-senhas">
                     <input
                     id="SenhaAtual"
@@ -123,7 +116,6 @@
                         <i :class="showPasswordConfirm ? 'fas fa-eye-slash' : 'fas fa-eye'" v-if="editandoSenha"></i>
                     </div>
                       </div>
-                      <!--  -->
                     <div v-if="editandoSenha" class="botoes-edicao">
                         <button class="botao-editar" @click="salvarNovaSenha">💾</button>
                         <button class="botao-editar" @click="cancelarNovaSenha">❌</button>
@@ -137,7 +129,6 @@
                 </div>
             </div>
 
-          <!-- TECNOLOGIAS / Exibição normal (sem edição) -->
 <div class="form-group" v-if="!editandoTecnologias">
   <label>Tecnologias:</label>
   <div class="tecnologia-tags-container">
@@ -151,7 +142,6 @@
 </div>
 
 
-<!-- TECNOLOGIAS / Edição -->
 <div class="form-group" v-else>
   <label>Tecnologias:</label>
   <div class="tecnologia-tags-container">
@@ -165,7 +155,6 @@
         {{ tec.descricao }}
       </label>
     </div>
-    <!-- Botões no mesmo lugar do botão de editar -->
     <div class="botoes-editar">
       <button class="botao-editar" @click="salvarTecnologias">💾</button>
       <button class="botao-editar" @click="cancelarEdicaoTecnologias">❌</button>
@@ -188,25 +177,25 @@
         },
         data() {
             return {
-                nomeProjeto: '',       // nome salvo
-                novoNomeProjeto: '',   // edição temporária
+                nomeProjeto: '',       
+                novoNomeProjeto: '',   
                 editandoNomeProjeto: false,
-                descricaoProjeto: '',       // nome salvo
-                novaDescricaoProjeto: '',   // edição temporária
+                descricaoProjeto: '',       
+                novaDescricaoProjeto: '',   
                 editandoDescricaoProjeto: false,
                 todasTecnologias: [],
-                tecnologiasSelecionadas: [], // Estado atual
-                tecnologiasBackup: [], // Armazena backup durante edição
+                tecnologiasSelecionadas: [], 
+                tecnologiasBackup: [], 
                 editandoTecnologias: false,
                 participantes: [],
                 tecnologias: [],
-                idProjeto: 87, // Substitua com a lógica correta para obter o ID do projeto atual
+                idProjeto: 87, 
                 showSugestaoModal: false,
                 devSugestoes: [],
                 allUsers: [],
                 participantes: [],
                 devsSelecionados: [],
-                // a partir daqui são os dados do perfil
+
                 name: '',
                 oldName: '',
                 email: '',
@@ -228,8 +217,6 @@
             };
         },
         mounted() {
-            // this.buscarParticipantes();
-            // this.buscarDetalhesProjeto();
             this.fetchProfile();
             fetch('http://localhost:3000/tecnologys/listTecnologys')
             .then(res => res.json())
@@ -238,7 +225,7 @@
             });
         },
         methods: {
-          async fetchProfile() { //funcao que pega os dados do perfil
+          async fetchProfile() { 
       try {
         const response = await axios.get('http://localhost:3000/profile', {
           withCredentials: true
@@ -253,12 +240,12 @@
         this.$router.push("/login");
       }
     },
-    // a baixo as funcoes de edição de nome
-    editarNome() { // habilita a edição do nome e salva o nome original caso cancele a edicao
+
+    editarNome() { 
       this.editandoNome = true;
       this.oldName = this.name;
     },
-    async salvarNovoNome() { // chama a rota back de edicao de nome e recebe a resposta
+    async salvarNovoNome() { 
       console.log('Salvar clicado');
       try {
         const response = await axios.put('http://localhost:3000/profile/updateProfileName', {
@@ -272,14 +259,10 @@
         alert('Erro ao salvar nome. Tente novamente.');
       }
     },
-    cancelarNovoNome() { // cancela a edicao de nome e reseta o nome para o original
-      // console.log('Cancelar edição de nome');
-      // console.log('this.oldName: ', this.oldName);
-      // console.log('this.name: ', this.name);
-      this.name = this.oldName; // Reset to original name
+    cancelarNovoNome() { 
+      this.name = this.oldName; 
       this.editandoNome = false;
     },
-    // a baixo as funcoes de edição de email
      editarEmail() {
       this.editandoEmail = true;
       this.oldEmail = this.email;
@@ -307,10 +290,9 @@
       }
     },
     cancelarNovoEmail() {
-      this.email = this.oldEmail; // Reset to original email
+      this.email = this.oldEmail; 
       this.editandoEmail = false;
     },
-    // a baixo as funcoes de edição de senha
     editarSenha() {
       this.editandoSenha = true;
     },
@@ -360,7 +342,7 @@
       }
     },
     openFileDialog() {
-      this.$refs.fileInput.click(); // Abre o seletor de arquivo
+      this.$refs.fileInput.click(); 
     },
     async handleFileChange(event) {
       const file = event.target.files[0];
@@ -378,22 +360,15 @@
             withCredentials: true
           });
 
-
-        // if (!response.ok) throw new Error('Erro no upload');
-        // const data = await response.json();
-
         console.log('Upload realizado com sucesso:');
-        this.profileImageUpdated++;  // atualiza e passa para navbar
+        this.profileImageUpdated++;  
         this.fetchProfile();
-        // Aqui você pode atualizar a imagem de perfil, se quiser
       } catch (error) {
         console.error('Erro no upload:', error);
       }
     },
-    // a baixo, sao as functions legadas do propriedades do projeto
             async salvarNomeProjeto() {
                 console.log("this.nomeNomeProjeto: ", this.novoNomeProjeto);
-                // this.nomeProjeto = this.novoNomeProjeto;
                 this.editandoNomeProjeto = false;
                 const response = await axios.put(`http://localhost:3000/project/updateNameProject`, {
                     projeto_id: this.$route.params.id,
@@ -409,9 +384,6 @@
             async salvarDescricaoProjeto() {
                 
                 this.editandoDescricaoProjeto = false;
-                // console.log("this.nomeNomeProjeto: ", this.novoNomeProjeto);
-                // this.nomeProjeto = this.novoNomeProjeto;
-                // this.editandoNomeProjeto = false;
                 const response = await axios.put(`http://localhost:3000/project/updateDescriptionProject`, {
                     projeto_id: this.$route.params.id,
                     descricaoProjeto: this.descricaoProjeto,
@@ -425,7 +397,7 @@
             },
             editarTecnologias() {
                 this.tecnologiasSelecionadas = this.skills.map(t => t.tecnologia_id);
-                this.tecnologiasBackup = [...this.tecnologiasSelecionadas]; // cria backup antes de editar
+                this.tecnologiasBackup = [...this.tecnologiasSelecionadas];
                 this.editandoTecnologias = true;
             },
             async salvarTecnologias() {
@@ -436,10 +408,10 @@
                     }, {
                     withCredentials: true,
                 });
-                this.fetchProfile(); // atualiza o perfil após salvar
+                this.fetchProfile(); 
             },
             cancelarEdicaoTecnologias() {
-                this.tecnologiasSelecionadas = [...this.tecnologiasBackup]; // restaura do backup
+                this.tecnologiasSelecionadas = [...this.tecnologiasBackup]; 
                 this.editandoTecnologias = false;
             },
             async buscarParticipantes() {
@@ -454,7 +426,6 @@
     }
   },
             async confirmarRemocao(participante) {
-                //console.log("participante: ", participante)
             const confirmacao = confirm(`Deseja realmente remover participante do projeto?`);
             if (!confirmacao) return;
 
@@ -470,7 +441,6 @@
             console.log("responseDeleteUser: ", response);
             if (response.statusText != "OK") throw new Error("Erro ao remover participante.");
             alert("Participante removido com sucesso!");
-            // Recarrega a lista
             this.buscarParticipantes();
             } catch (error) {
             console.error("Erro ao remover participante:", error);
@@ -479,22 +449,14 @@
 
 
   async adicionarParticipanteModal() {
-    // Abre modal ou redireciona para tela de adicionar participante
-    // alert("Abrir modal de adicionar participante");
     const sugestoesRes = await fetch(`http://localhost:3000/project/devSugestionProject/${this.$route.params.id}`, {
         credentials: "include"
-      });
-      // const allUsersRes = await fetch(`http://localhost:3000/auth/getUsers`, {
-      //   credentials: "include"
-      // });
-      
+      });      
       
       if (!sugestoesRes.ok) throw new Error("Erro ao buscar sugestões de devs");
 
       const sugestoes = await sugestoesRes.json();
-      //const users = await allUsersRes.json();
       console.log("allUsersRes: ", sugestoes);
-      //console.log("sugestoes: ", sugestoes);
       this.devSugestoes = sugestoes.sugestaoDevs;
       this.allUsers = sugestoes.desenvolvedoresRestantes;
     this.showSugestaoModal = true;
@@ -525,7 +487,6 @@
     } catch (error) {
       console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
-      //this.showSugestaoModal = false;
     }
   },
   
@@ -543,32 +504,26 @@
           const blob = new Blob([bytes], { type: this.profileImage.tipo });
           console.log("blob: ", blob);
           return URL.createObjectURL(blob);
-          // console.log("ẗhis.profileImage: ", this.profileImage);
         }
 
-        // imagem padrão
-        // return 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg';
       }
     }
     }
 </script>
 <style scoped>
 .sidebar {
-    /* margin-top: 15px; */
     margin-top: 13px;
 }
 
 .page-title {
   position: flex;
   text-align: center;
-  /* align-items: center; */
   margin-top: -80px;
 }
 .profile-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* height: 500px; */
     background: transparent ;
     margin-top: 56px;
     overflow-x: hidden;
@@ -581,8 +536,6 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
     text-align: center;
     width: 100%;
-    /* max-width: 800px; */
-    /* max-height: 450px; */
     height: 549px;
     display: flex;
     flex-direction: column;
@@ -622,7 +575,6 @@
   .form-group-senhas {
     display: flex;
     flex-direction: column;
-    /* margin-bottom: 16px; */
     width: 100%;
     gap: -900px;
   }
@@ -658,9 +610,9 @@
 }
 
 .input {
-  flex-shrink: 0;       /* impede o input de encolher */
-  width: 100%;          /* ocupa todo o espaço possível */
-  max-width: 400px;     /* limite máximo para manter o layout controlado */
+  flex-shrink: 0;      
+  width: 100%;        
+  max-width: 400px;     
   padding: 10px 15px;
   margin: 10px 0;
   border: none;
@@ -689,7 +641,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 12px;  /* espaçamento entre o input e os botões */
+  margin-left: 12px;  
   flex-shrink: 0;
 }
 
@@ -699,7 +651,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: -40px;  /* espaçamento entre o input e os botões */
+  margin-left: -40px; 
   flex-shrink: 0;
 }
 
@@ -734,30 +686,27 @@
   display: flex;
   position:relative;
   flex-wrap: wrap;
-  /* left: -60px; */
   width: 900px;
   gap: 8px;
-  border: 1px solid transparent;          /* borda padrão */
-  border-radius: 6px;              /* borda arredondada igual inputs */
+  border: 1px solid transparent;          
+  border-radius: 6px;             
   padding: 5px 10px;
-  margin: 10px;               /* espaço interno para "respirar" */
-  background-color: #444;          /* mesma cor de fundo dos inputs */
-  min-height: 38px;                /* altura mínima semelhante a input */
-  cursor: default;                 /* cursor padrão, não editável */
-  box-sizing: border-box;          /* para padding não aumentar tamanho */
-  flex-shrink: 0;       /* impede o input de encolher */
-  width: 100%;          /* ocupa todo o espaço possível */
-  max-width: 430px;     /* limite máximo para manter o layout controlado */
+  margin: 10px;              
+  background-color: #444;          
+  min-height: 38px;                
+  cursor: default;                 
+  box-sizing: border-box;          
+  flex-shrink: 0;       
+  width: 100%;        
+  max-width: 430px;    
 }
 
 .tecnologia-tags-container {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   position: relative;
   gap: 1px;
   width: 123%;
-  /* max-width: 3000px; */
   margin-left: -60px;
 }
 
@@ -787,7 +736,6 @@
   }
 
 .checkbox-list {
-    /* flex-direction: column; */
     columns: 4;
   display: flex;
   flex-wrap: wrap;
@@ -799,9 +747,7 @@
   margin-left: 10px;
   margin-top: 10px;
   width: 87%;
-  /* max-width: 1000px; */
   box-sizing: border-box;
-  /* flex: 1; */
 }
 
 .checkbox-item {
@@ -822,17 +768,10 @@
   justify-content: space-between;
   align-items: center;
   width: 380px;
-  /* margin-left: -10px; */
   margin-bottom: 10px;
 }
 
 .botao-adicionar {
-  /* background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer; */
   margin-left: 8px;
   background-color: #666;
   border: none;
@@ -888,9 +827,9 @@
   color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 600px; /* aumentei um pouco a largura para comportar 4 colunas */
+  width: 600px; 
   height: 85vh;
-  overflow-y: auto; /* scroll automático se passar da tela */
+  overflow-y: auto; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -942,9 +881,8 @@
 }
 
 .modal-checkbox-label {
-  /* display: flex; */
   align-items: center;
-  gap: 8px; /* espaço entre checkbox e nome */
+  gap: 8px; 
   cursor: pointer;
 }
 
@@ -957,11 +895,10 @@
   transform: translateY(-50%);
   cursor: pointer;
   color: #000000;
-  /* border: 3px solid #ff0000; */
 }
 
 .password-toggle:hover i {
-  color: #808080; /* Cor do ícone quando o mouse passa sobre */
+  color: #808080; 
 }
 
 .edit-profile-image {

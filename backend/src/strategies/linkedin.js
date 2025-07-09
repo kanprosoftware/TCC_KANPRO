@@ -15,7 +15,6 @@ export default function(passport) {
         access_type: 'offline'
       }
   }, async (accessToken, refreshToken, profile, done) => {
-    // console.log("profile", profile);
       try {
         const result = await handleOAuthCallback({
                 provider:'linkedin',

@@ -30,9 +30,6 @@ import {
 } from "../services/todoService.js";
 
 export const createTodo = async (req, res) => {
-    // console.log("----------------------------------------");
-    //  console.log("req: ", req);
-    //  console.log("----------------------------------------");
     const userSessionId = req.usuario_id;
     const projectId = parseInt(req.body.projetoId);
     const todoData = {
@@ -40,8 +37,6 @@ export const createTodo = async (req, res) => {
         userSessionId,
         projectId,
     };
-    //console.log("todoData: ", todoData);
-    //console.log("userSessionId: ", userSessionId);
     try {
         const todo = await createTodoItem(todoData);
         res.status(201).json(todo);
@@ -109,9 +104,6 @@ export const listTodosGantt = async (req, res) => {
 };
 
 export const addParticipantes = async (req, res) => {
-  // const userSessionId = req.usuario_id;
-  // const projectId = parseInt(req.body.projetoId);
-  //console.log("req.body.projetoId: ", req);
   const todoData = {
     projeto_id: req.body.projeto_id,
     tarefa_id: req.body.tarefa_id,
@@ -127,9 +119,6 @@ export const addParticipantes = async (req, res) => {
 }
 
 export const listParticipantes = async (req, res) => {
-    // console.log("----------------------------------------");
-    // console.log("req: ", req);
-    // console.log("----------------------------------------");
     const projectId = parseInt(req.params.id);
   try {
     const participantes = await getParticipantes(projectId);
@@ -140,9 +129,6 @@ export const listParticipantes = async (req, res) => {
 };
 
 export const excludeParticipantesTodo = async (req, res) => {
-  // console.log("----------------------------------------");
-  // console.log("req: ", req);
-  // console.log("----------------------------------------");
   const todoData = {
     projeto_id: req.body.projeto_id,
     tarefa_id: req.body.tarefa_id,
@@ -183,8 +169,6 @@ export const updateDoing = async (req, res) => {
 
 export const updateConclude = async (req, res) => {
   const userSessionId = req.usuario_id;
-  //console.log("req.body.projetoId", req.body.projetoId);
-  //console.log("req.body.tarefaId", req.body.tarefaId);
   const todoData = {
     projeto_id: parseInt(req.body.projetoId),
     tarefa_id: parseInt(req.body.tarefaId),
@@ -199,9 +183,6 @@ export const updateConclude = async (req, res) => {
 };
 
 export const updateDescription = async (req, res) => {
-  // console.log("----------------------------------------");
-  // console.log("req: ", req);
-  // console.log("----------------------------------------");
   const descriptionData = {
     tarefa_id: req.body.tarefa_id,
     descricao: req.body.descricao,
@@ -237,7 +218,6 @@ export const listOverdueTodos = async (req, res) => {
 };
 
 export const addCategoryTodo = async (req, res) => {
-    //console.log("id todoList: ", req.params.id);
   try {
     const todos = await addCategory(req.params.id, req.body.categoryId);
     res.json(todos);
@@ -254,15 +234,6 @@ export const markTodoComplete = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
-// export const updateTodoDescription = async (req, res) => {
-//   try {
-//     const updatedTodo = await updateTodoField(req.params.id, { description: req.body.description });
-//     res.json(updatedTodo);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
 
 export const updateTodoDateForConclusion = async (req, res) => {
   try {
@@ -335,9 +306,6 @@ export const addComentTodo = async (req, res) => {
 }
 
 export const getCommentsTodo = async (req, res) => {
-  // console.log("----------------------------------------");
-  // console.log("req: ", req);
-  // console.log("----------------------------------------");
   try {
     const commentsTodo = await getComentarios(req.params.id);
     res.json(commentsTodo);
@@ -347,7 +315,6 @@ export const getCommentsTodo = async (req, res) => {
 }
 
 export const editCommentTodo = async (req, res) => {
-  //console.log("req.usuario_id", req);
   const usuario_id = parseInt(req.usuario_id);
   const tarefa_id = parseInt(req.body.tarefa_id);
   const comentario = req.body.comentario;
@@ -369,7 +336,6 @@ export const editCommentTodo = async (req, res) => {
 }
 
 export const deleteComentTodo = async (req, res) => {
-  // console.log("req.usuario_id", req);
   const usuario_id = parseInt(req.usuario_id);
   const tarefa_id = parseInt(req.body.tarefa_id);
   const projeto_id = parseInt(req.body.projeto_id);
@@ -404,7 +370,6 @@ export const addAttachmentTodo = async (req, res) => {
       conteudo: file.buffer,
     }));
   }
-  // console.log("attachmentData: ", attachmentData)
   try {
     const attachment = await addAttachment(attachmentData);
     res.status(201).json(attachment);
@@ -423,9 +388,6 @@ export const listAttachmentTodo = async (req, res) => {
 }
 
 export const downloadAttachmentByIdTodo = async (req, res) => {
-  //console.log("----------------------------------------");
-  //console.log("req: ", req);
-  //console.log("----------------------------------------");
   const attachmentData = {
     projeto_id: req.query.projeto_id,
     tarefa_id: req.query.tarefa_id,
@@ -434,19 +396,12 @@ export const downloadAttachmentByIdTodo = async (req, res) => {
   }
   try {
     const file = await downloadAttachmentById(attachmentData);
-    //console.log("file: ", file);
-    // Exibir se for imagem (qualquer) ou PDF
     const isImage = file.tipo.startsWith('image/');
     const isPdf = file.tipo === 'application/pdf';
 
     const isInline = isImage || isPdf;
-    //console.log("inline: ", isInline)
     res.header('Content-Type', file.tipo);
     res.header('Content-Disposition', `${isInline ? 'inline' : 'attachment'}; filename="${(file.nome)}"`);
-    // res.set({
-    //   'Content-Type': file.tipo,
-    //   'Content-Disposition': `${isInline ? 'inline' : 'attachment'}; filename="${file.nome}"`,
-    // });
 
     res.send(file.conteudo);
   } catch (error) {
@@ -462,12 +417,10 @@ export const exludeAttachmentTodo = async (req, res) => {
     usuario_id: req.usuario_id,
     anexoTarefa_id: req.body.anexoTarefa_id
   }
-  // console.log("attachmentData: ", attachmentData);
   try {
     const file = await excludeAttachment(attachmentData);
     res.status(201).json( file.conteudo );
   } catch (error) {
-    //console.error('Erro ao manipular arquivo:', error.message);
     res.status(400).json({ error: error.message });
   }
 }

@@ -3,18 +3,15 @@ import jwt from "jsonwebtoken";
 export const authenticateToken = (req, res, next) => {
   console.log("Autenticando token...");
   const token = 
-    req.session?.token || // sessão
-    req.query?.token ||   // query string
-    req.headers?.authorization?.split(" ")[1]; // Authorization: Bearer <token>
+    req.session?.token || 
+    req.query?.token ||   
+    req.headers?.authorization?.split(" ")[1]; 
   if (!token) {
     return res.status(401).json({ error: "Token de acesso é obrigatório." });
   }
 
   try {
-    //console.log("token", token);
-    //console.log("jwt_secret", process.env.JWT_SECRET);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //console.log("Decoded token:", jwt.verify(token, process.env.JWT_SECRET));
 
     if (!decoded?.usuario_id) {
       return res.status(403).json({ error: "Token inválido." });
@@ -27,23 +24,21 @@ export const authenticateToken = (req, res, next) => {
     next(); 
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      console.error("Erro de JWT:", error.message);  // Erro de JWT específico
+      console.error("Erro de JWT:", error.message); 
     } else if (error instanceof jwt.TokenExpiredError) {
-      console.error("Token expirado:", error.message);  // Token expirado
+      console.error("Token expirado:", error.message); 
     } else {
-      console.error("Erro desconhecido:", error.message);  // Outros erros
+      console.error("Erro desconhecido:", error.message); 
     }
     return res.status(403).json({ error: "Token inválido ou expirado." });
   }
 };
 
 export const authenticateTempToken = (req, res, next) => {
-  console.log("Autenticando token temporário...");
-  // console.log("req:", req);
-  const token =
-    req.session?.token ||  // sessão, no caso de estar armazenado na sessão
-    req.query?.token ||        // query string
-    req.headers?.authorization?.split(" ")[1] || // Authorization: Bearer <token>
+  console.log("Autenticando token temporário...");  const token =
+    req.session?.token ||  
+    req.query?.token ||        
+    req.headers?.authorization?.split(" ")[1] || 
     req.body?.token; 
     console.log("Token temporário recebido:", token);
 
@@ -52,15 +47,15 @@ export const authenticateTempToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_TEMP_SECRET);  // Usando uma chave secreta diferente
-    // console.log("Decoded token temporário:", decoded);
+    const decoded = jwt.verify(token, process.env.JWT_TEMP_SECRET);  
     if (!decoded?.login_id) {
       return res.status(403).json({ error: "Token temporário inválido." });
     }
 
-    req.user = decoded;  // Isso pode ser usado para acessar o usuário depois
+    req.user = decoded;  
     next();
   } catch (error) {
     return res.status(403).json({ error: "Token temporário inválido ou expirado." });
   }
 };
+

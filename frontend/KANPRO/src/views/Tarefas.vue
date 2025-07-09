@@ -7,7 +7,6 @@
   <div v-if="showModal" class="modal-overlay">
     <div class="modal-flex-container">
       
-      <!-- Conteúdo principal -->
       <div class="modal-content">
         <form class="form" @submit.prevent="updateTitle(element.id, novoTitulo)">
           <div class="title-edit-container">
@@ -48,12 +47,12 @@
                 v-model:content="comment"
                 content-type="html"
                     :toolbar="[
-                      [{ 'size': ['small', false, 'large', 'huge'] }],  // tamanhos de fonte
+                      [{ 'size': ['small', false, 'large', 'huge'] }],  
                       ['bold', 'italic', 'underline', 'strike'],
                       ['link', 'image'],
-                      [{ 'align': [] }],  // alinhamento
+                      [{ 'align': [] }], 
                       [{ 'indent': '-1' }, { 'indent': '+1' }],
-                      ['clean']  // remove formatações
+                      ['clean']  
                     ]"
                     :modules="modules"
               />
@@ -73,7 +72,6 @@
               </div>
               <div class="comentario-conteudo">
                 <div class="comentario-topo">
-                  <!-- <strong>{{ coment.usuario.nome }}</strong> -->
                   <span class="comentario-data">{{ formatDate(coment.data_hora) }}</span>
                 </div>
                 <div v-if="editandoComentarioId === coment.comentario_id" class="quill-editor-container">
@@ -82,12 +80,12 @@
                     v-model:content="comentarioEditado"
                     content-type="html"
                     :toolbar="[
-                      [{ 'size': ['small', false, 'large', 'huge'] }],  // tamanhos de fonte
+                      [{ 'size': ['small', false, 'large', 'huge'] }], 
                       ['bold', 'italic', 'underline', 'strike'],
                       ['link', 'image'],
-                      [{ 'align': [] }],  // alinhamento
+                      [{ 'align': [] }],  
                       [{ 'indent': '-1' }, { 'indent': '+1' }],
-                      ['clean']  // remove formatações
+                      ['clean'] 
                     ]"
                     :modules="modules"
                   />
@@ -96,7 +94,6 @@
                     <button @click="cancelarEdicao"@click.stop>Cancelar</button>
                   </div>
                 </div>
-                <!-- <p v-else class="comentario-texto" v-html="coment.comentario"></p> -->
                  <p v-else class="ql-editor" v-html="coment.comentario"></p>
                 <div
                   v-if="commentMenuVisivel"
@@ -115,7 +112,6 @@
         </div>
       </div>
 
-      <!-- Sidebar -->
       <div class="modal-sidebar">
         <ul>
           <li @click="abrirJanelaParticipantes(element.id)">👥 Adicionar Participante</li>
@@ -200,9 +196,6 @@
       <Sidebar @navigate="handleSidebarClick" />
     </div>
   <div class="board">
-    <!-- <div class="sidebar">
-      <Sidebar @navigate="handleSidebarClick" />
-    </div> -->
     <div v-for="(list, index) in filteredKanbanLists" :key="index" class="column">
       <h2>{{ list.name }}</h2>
       <draggable
@@ -283,10 +276,6 @@
       {{ contextCard.paused ? 'Continuar tarefa' : 'Pausar tarefa' }}
     </li>
     <li @click="handleMenuOption('delete')">Excluir tarefa</li>
-    <!-- <button @click="criarProjeto">Criar Projeto</button> -->
-    <!-- <li @click="handleMenuOption('addParticipant')">Adicionar participante</li> -->
-    <!-- <li href="#">Adicionar Arquivo</li>
-    <li href="#">Adicionar Comentario</li> -->
   </ul>
 </div>
 
@@ -299,7 +288,6 @@ import Sidebar from '../components/Sidebar.vue';
 import axios from 'axios';
 import { nextTick } from 'vue';
 import { addComent, getParticipantes, listAttachment, updateTitle } from '../../../../backend/src/services/todoService';
-// import { ref } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
@@ -357,7 +345,6 @@ export default {
   mounted() {
     this.devName = localStorage.getItem('nomeDesenvolvedor');
     this.getDevNameComent();
-    // console.log("cookie: ", local);
     this.fetchTasks();
     document.addEventListener('click', this.handleClickOutside);
     window.addEventListener('keydown', this.handleEsc);
@@ -371,10 +358,10 @@ export default {
   methods: {
     getFirstNameInitials(namesString) {
       return namesString
-        .split(',')                          // Divide pelos nomes
-        .map(name => name.trim())           // Remove espaços extras
-        .map(name => name.split(' ')[0])    // Pega o primeiro nome de cada
-        .map(firstName => firstName.charAt(0).toUpperCase()) // Pega a inicial
+        .split(',')                          
+        .map(name => name.trim())           
+        .map(name => name.split(' ')[0])   
+        .map(firstName => firstName.charAt(0).toUpperCase()) 
         .join('');
     },
     fecharCommentMenu() {
@@ -389,22 +376,17 @@ export default {
       this.novoTitulo = '';
     },
     abrirCommentMenu(event, comentario) {
-      //console.log("comentMenu comentario: ", comentario);
       this.comentarioSelecionado = comentario;
       this.commentMenuX = event.clientX;
       this.commentMenuY = event.clientY;
       this.commentMenuVisivel = true;
     },
     openFileDialog() {
-      this.$refs.fileInput.click(); // Abre o seletor de arquivo
+      this.$refs.fileInput.click(); 
     },
     onFileChange(event) {
-      //console.log("chamou OnFileChange");
       const selectedFiles = Array.from(event.target.files);
-      //console.log("selectedFiles: ", selectedFiles);
       if (selectedFiles) {
-        //console.log("entrou no if");
-        //this.file = selectedFiles;
         this.uploadFile(selectedFiles);
       }
     },
@@ -415,31 +397,25 @@ export default {
             projeto_id: this.$route.params.id,
             tarefa_id: taskId
           },
-          responseType: 'blob', // importante para arquivos binários
+          responseType: 'blob', 
           withCredentials: true
         });
-        //const data = await response.json();
-        //console.log("response file: ", response.headers['content-disposition']);
         const contentType = response.headers['content-type'];
         const contentDispositions = response.headers['content-disposition'];
-        // Cria um link temporário com o blob
         const blob = new Blob([response.data], { type: response.headers['content-type'] });
         const url = URL.createObjectURL(blob);
         const isInlineType = contentType.startsWith('image/') || contentType === 'application/pdf';
         if (isInlineType) {
-          // Abre o arquivo diretamente em uma nova aba
           const response = await axios.get(`http://localhost:3000/todos/downloadAttachment/${attachmentId}&inline=true`, {
             params: {
               projeto_id: this.$route.params.id,
               tarefa_id: taskId
             },
-            responseType: 'blob', // importante para arquivos binários
+            responseType: 'blob', 
             withCredentials: true
           });
-          // console.log("response file: ", response);
           window.open(response.request.responseURL, '_blank');
         } else {
-          // Cria o elemento <a> para forçar download
           const link = document.createElement('a');
           link.href = url;
 
@@ -452,23 +428,18 @@ export default {
         }
         URL.revokeObjectURL(url);
       } catch (error) {
-        // alert(`Erro: ${error.response.data.error}`);
         console.error('Erro ao baixar arquivo:', error);
       }
     },
     async uploadFile(files) {
-      // console.log("chamou UploadFile");
-      // console.log("element: ", this.element.id)
       const formData = new FormData();
 
-      formData.append("tarefa_id", this.element.id);     // por exemplo, tarefaId = 1
-      formData.append("projeto_id", this.$route.params.id);   // por exemplo, projetoId = 2
+      formData.append("tarefa_id", this.element.id);    
+      formData.append("projeto_id", this.$route.params.id);   
 
-      // Adiciona os arquivos (vários, com mesmo nome "arquivos")
       for (const file of files) {
-        formData.append("arquivos", file); // "arquivos" é o mesmo nome usado no multer
+        formData.append("arquivos", file); 
       }
-      // console.log("response files : ");
 
       try {
         const response = await axios.post(
@@ -477,13 +448,8 @@ export default {
           { withCredentials: true }
         );
         await this.listAttachments(this.element.id);
-        //await this.fetchComments(taskId);
-        //console.log("response files : ", response);
-        //const data = await response.json();
-        //console.log("data: ", data);
         if (response.status == 201) {
           alert('Arquivo enviado com sucesso!');
-          // Aqui você pode atualizar o estado com o novo arquivo
         } else {
           alert('Erro no envio do arquivo.');
         }
@@ -494,14 +460,10 @@ export default {
     },
     async   listAttachments(todoId) {
       try {
-        //const response = await fetch(`http://localhost:3000/todos/getComments/${todoId}`);
         const response = await axios.get(`http://localhost:3000/todos/listAttachment/${todoId}`, {
           withCredentials: true
         });
-        // console.log("response: ", response.data);
-        //const data = await response.json();
         this.attachments = response.data;
-        //console.log("comments: ", data);
       } catch (error) {
         console.error('Erro ao buscar anexos:', error);
       }
@@ -512,15 +474,10 @@ export default {
         });
       this.devNameComent = response.data.nome;
       this.devIdParticipante = response.data.usuario_id;
-      // console.log("this.profile: ", response.data.login)
       this.profileImage = response.data.login.profile_image;
-      // console.log("this.profileImageeeeeee: ", this.profileImage);
-      // console.log("devNameComenteeeeeeeeeeeeee: ", this.devNameComent);
     },
     async removerAttachment(attachmentId, taskId) {
       if (!confirm("Tem certeza que deseja remover este arquivo??")) return;
-      // console.log("attachmentId: ", attachmentId);
-      // console.log("taskId: ", taskId);
       try {
       const response = await axios.delete('http://localhost:3000/todos/exludeAttachment', {
           data: {
@@ -537,20 +494,15 @@ export default {
     },
     async fetchComments(todoId) {
       try {
-        //const response = await fetch(`http://localhost:3000/todos/getComments/${todoId}`);
         const response = await axios.get(`http://localhost:3000/todos/getComments/${todoId}`, {
           withCredentials: true
         });
-        // console.log("response: ", response.data);
-        //const data = await response.json();
         this.comments = response.data;
-        //console.log("comments: ", data);
       } catch (error) {
         console.error('Erro ao buscar comentários:', error);
       }
     },
     async addComent(taskId, comment) {
-      // console.log("comment: ", comment);
       if (comment.length <= 0 || comment === '<p><br></p>') {
         alert("Por favor, escreva um comentário.");
         return;
@@ -569,13 +521,8 @@ export default {
             comment = '';
             if (this.$refs.quillRef && this.$refs.quillRef.getQuill) {
               const quill = this.$refs.quillRef.getQuill();
-              quill.setContents([]); // Também pode usar quill.setText('')
+              quill.setContents([]); 
             }
-            // this.descricaoAtualizada = true;
-            // setTimeout(() => {
-            //   this.descricaoAtualizada = false;
-            // }, 2000);
-            // console.log("Descrição atualizada com sucesso:", response.data);
           } catch (error) {
             console.error("Erro ao adicionar comentario", error.response.data.error);
             alert(`Erro: ${error.response.data.error}`);
@@ -583,15 +530,12 @@ export default {
           }
     },
     editarComentario() {
-      // console.log("comentario selecionado: ", this.comentarioSelecionado);
       
       if (!this.comentarioSelecionado) return;
 
       const comentario = this.comentarioSelecionado;
       this.editandoComentarioId = comentario.comentario_id;
       this.comentarioEditado = comentario.comentario;
-
-      // console.log("comentario editado: ", this.comentarioEditado);
 
       this.commentMenuVisivel = false;
     },
@@ -600,10 +544,7 @@ export default {
         alert("Por favor, escreva um comentário.");
         return;
       }
-      // console.log("comentario editado selecionado: ", this.comentarioSelecionado);
-      // console.log("elementeId: ", elementId);
-      // if (!this.comentarioSelecionado) return;
-      // console.log("this.comentarioEditado", this.comentarioEditado);
+
       try {
         const response = await axios.put('http://localhost:3000/todos/editComentTodo', {
               comentario_id: this.comentarioSelecionado.comentario_id,
@@ -616,7 +557,6 @@ export default {
             await this.fetchComments(elementId);
       } catch (error) {
         alert(`Erro: ${error.response.data.error}`);
-        // console.log("erro", error);
       }
       this.editandoComentarioId = null;
       this.comentarioEditado = '';
@@ -626,10 +566,6 @@ export default {
       this.comentarioEditado = '';
     },
     async excluirComentario(elementId) {
-      // console.log("comentario editado selecionado: ", this.comentarioSelecionado);
-      // console.log("elementeId: ", elementId);
-      // if (!this.comentarioSelecionado) return;
-      // console.log("this.comentarioEditado", this.comentarioEditado);
       try {
         await axios.delete('http://localhost:3000/todos/deleteComentTodo', {
           data: {
@@ -639,22 +575,11 @@ export default {
               },
           withCredentials: true
         });
-        // const response = await axios.delete('http://localhost:3000/todos/deleteComentTodo', {
-        //       data: {
-        //         comentario_id: this.comentarioSelecionado.comentario_id,
-        //         tarefa_id: elementId,
-        //         projeto_id: this.$route.params.id,
-        //       },
-        //       withCredentials: true
-        //     });
             await this.fetchComments(elementId);
             
       } catch (error) {
         alert(`Erro: ${error.response.data.error}`);
-        // console.log("erro", error);
       }
-      // this.editandoComentarioId = null;
-      // this.comentarioEditado = '';
       this.commentMenuVisivel = false;
     },
     async getParticipantes(taskId) {
@@ -662,15 +587,12 @@ export default {
         const response = await axios.get(`http://localhost:3000/todos/listParticipantes/${taskId}`, {
           withCredentials: true
         });
-        // console.log("participantes: ", response.data);
         return this.participantes = response.data;
-        // return response.data;
       } catch (error) {
         console.error('Erro ao buscar participantes:', error);
       }
     },
     async nameProject() {
-      //const projectId = this.$route.params.id;
       const response = await axios.get('http://localhost:3000/project/detaisProject/{id}', {
           params: {
             projeto_id: this.$route.params.id,
@@ -678,50 +600,31 @@ export default {
           withCredentials: true
         });
         return this.namedProject = response.data[0].nome;
-        // console.log("this.namedProject: ", this.namedProject)
     },
     openTask(card, listName, devName) {
       this.comment = '';
       setTimeout(() => {
         this.showModal = true;
-      }, 50); // 50ms é suficiente
-      //console.log("listName: ", listName);
+      }, 50); 
       this.element = card;
-      //console.log("element: ", this.element);
       this.selectedListName = listName;
       this.fetchComments(card.id);
       this.getParticipantes(card.id);
       this.janelaParticipantesAberta = false;
       this.listAttachments(card.id);
-      //console.log("abrir tarefa", devName);
-      // this.showModal = true;
-      // this.newProject = {
-      //   name: "",
-      //   description: "",
-      //   technologiesInput: ""
-      // }; 
     },
     handleEsc(event) {
       if (event.key === 'Escape') {
-        this.fecharModal(); // ou qualquer outra função
+        this.fecharModal(); 
       }
     },
     async fecharModal() {
-      // console.log("fechar modal");
       await this.fetchTasks();
       this.showModal = false;
-      
-      // this.newProject = {
-      //   name: "",
-      //   description: "",
-      //   technologiesInput: ""
-      // };
-      // this.habilidades = [];
     },
     async fetchTasks() {
       try {
         const projectId = this.$route.params.id;
-        // console.log("projectId: ", projectId);
         const response = await axios.get('http://localhost:3000/todos', {
           params: {
             idProjeto: projectId
@@ -730,8 +633,6 @@ export default {
         });
 
         const tasks = response.data;
-        // console.log("tasks: ", tasks);
-        // console.log("tasks: ", tasks);
         this.kanbanLists.forEach(list => (list.items = []));
 
         const participantesPorTarefa = await Promise.all(tasks.map(async (task) => {
@@ -761,23 +662,16 @@ export default {
             const nomes = entrada 
             ? entrada.participantes.map(p => p.usuario.nome).join(', ') 
             : 'Sem participantes';
-            // if (task.pausas.length > 0) {
-            //   console.log("TAREFA PAUSADA: ", task);
-            // } else {
-            //   console.log("TAREFA NÃO PAUSADA");
-            // }
             if (task.pausas.some(pausa => pausa.fimPausa === null)) {
-              // console.log('Existe uma pausa ainda em aberto');
               list.items.push({
                 id: task.tarefa_id,
                 title: task.titulo,
                 barColor: task.colorBar,
                 description: task.descricao,
                 devName: nomes,
-                paused: true // Marca a tarefa como pausada
+                paused: true 
               });
             } else {
-              // console.log('Todas as pausas foram finalizadas');
               list.items.push({
                 id: task.tarefa_id,
                 title: task.titulo,
@@ -789,9 +683,7 @@ export default {
             }
           }
         });
-        // console.log("kanbanLists: ", this.kanbanLists);
       } catch (error) {
-        // console.error("Erro ao buscar tarefas:", error);
         alert("Faça login para continuar")
         this.$router.push("/login");
       }
@@ -815,7 +707,6 @@ export default {
         nomeDesenvolvedor: this.nomeDesenvolvedor,
       };
 
-      // Se estiver adicionando na lista "Doing", incluir a data
       if (listName === "Doing") {
         payload.doing = true;
       }
@@ -831,10 +722,8 @@ export default {
         withCredentials: true
       });
 
-      // console.log("responseName: ", responseName.data.nome);
 
       const novaTarefa = response.data;
-      // console.log("novaTarefa: ", novaTarefa);
       this.kanbanLists[index].items.unshift({
         id: novaTarefa.tarefa_id,
         title: novaTarefa.titulo,
@@ -867,8 +756,6 @@ async excluirTarefa(card) {
   }
 },
     async updateDescription(taskId, description) {
-      // console.log("taskId: ", taskId);
-      // console.log("description: ", description);
           try {
             const response = await axios.put('http://localhost:3000/todos/description/:id', {
               tarefa_id: taskId,
@@ -881,17 +768,12 @@ async excluirTarefa(card) {
             setTimeout(() => {
               this.descricaoAtualizada = false;
             }, 2000);
-            // console.log("Descrição atualizada com sucesso:", response.data);
           } catch (error) {
-            //alert()
-            // console.log("error: ", error);
             alert(`Erro: ${error.response.data.error}`);
             console.error("Erro ao atualizar descrição:", error);
           }
     },
     async updateTitle(taskId, title) {
-      // console.log("taskId: ", taskId);
-      // console.log("description: ", title);
           try {
             const response = await axios.put('http://localhost:3000/todos/title/', {
               tarefa_id: taskId,
@@ -900,17 +782,10 @@ async excluirTarefa(card) {
             }, {
               withCredentials: true
             });
-            //this.editandoTitulo = true;
-            // setTimeout(() => {
             this.element.title = response.data.titulo;
               this.editandoTitulo = false;
-            // }, 2000);
-            // console.log("Titulo atualizado com sucesso:", response.data);
           } catch (error) {
-            //alert()
-            // console.log("error: ", error);
             alert(`Erro: ${error.response.data.error}`);
-            // console.error("Erro ao atualizar titulo:", error);
           }
     },
     openColorPicker(event, card) {
@@ -920,10 +795,9 @@ async excluirTarefa(card) {
       this.color = card.barColor;
       this.showContextMenu = false;
 
-  // Pequeno delay para evitar conflito com o handleClickOutside
   setTimeout(() => {
     this.showColorPicker = true;
-  }, 50); // 50ms é suficiente
+  }, 50); 
     },
     async applyColor() {
       if (this.selectedCard) {
@@ -949,7 +823,6 @@ async excluirTarefa(card) {
     },
     async updateTaskStatus(taskId, status, projectId, card) {
       if(card.paused === true) {
-        //alert("Tarefa pausada, impossivel mover!");
         throw new Error('Tarefa pausada, impossivel mover!');
       }
       if (status === 'Doing') {
@@ -983,11 +856,8 @@ async excluirTarefa(card) {
       this.$router.push("/projetos");
     },
     handleMove(evt) {
-      //console.log("chamou a funcao de mover: ");
       const fromList = this.kanbanLists.find(list => list.name === this.currentList);
-      //console.log("fromList: ", fromList);
       const toList = this.kanbanLists.find(list => list.name === evt.to.dataset.list);
-      //console.log("toList: ", toList);
 
       if (fromList.name === 'Done') return false;
       if (
@@ -998,22 +868,15 @@ async excluirTarefa(card) {
       return true;
     },
     moveTaskBackOnError(task, fromListName, toListName) {
-      //console.log("chamou a funcao de mover de volta: ");
   const fromList = this.kanbanLists.find(list => list.name === fromListName);
   const toList = this.kanbanLists.find(list => list.name === toListName);
 
-  // console.log("fromList: ", fromList);
-  // console.log("toList: ", toList);
 
   if (toList && fromList) {
-    //console.log("entrou no if");
-    //console.log("task: ", task.__draggable_context.element.id);
-    // Remover da lista errada
     const index = toList.items.findIndex(item => item.id === task.__draggable_context.element.id);
-    // console.log("index: ", index);
     if (index !== -1) {
-      const [removedTask] = toList.items.splice(index, 1); // remove do destino
-      fromList.items.push(removedTask); // volta para origem
+      const [removedTask] = toList.items.splice(index, 1); 
+      fromList.items.push(removedTask); 
     }
   }
 },
@@ -1021,7 +884,6 @@ async excluirTarefa(card) {
       this.currentList = listName;
     },
     async handleDragEnd(listName, card, listNamePrevious) {
-      //console.log("listNamePrevious: ", listNamePrevious);
       this.selectedCard = card;
       const listElemente = listName;
       const listNamed = listElemente.dataset.list;
@@ -1029,12 +891,8 @@ async excluirTarefa(card) {
       const projectId = this.$route.params.id;
       try {
         const error = await this.updateTaskStatus(itemId, listNamed, projectId, this.selectedCard.__draggable_context.element);
-        // console.log("try: ");
       } catch (error) {
         console.error("catch: ", error);
-        // console.error("Erro ao atualizar status da tarefa:", error);
-        // alert("Erro ao atualizar status da tarefa. Tente novamente.");
-        // console.log("error: ", error);
         alert(`${error}`);
         this.moveTaskBackOnError(this.selectedCard, listNamePrevious, listNamed);
       }
@@ -1055,7 +913,6 @@ async excluirTarefa(card) {
   }
 
   if (this.showContextMenu && contextMenu && !contextMenu.contains(event.target)) {
-    // console.log("chamou o if do contextMenu");
     this.showContextMenu = false;
   }
 
@@ -1089,27 +946,23 @@ handleMenuOption(option) {
 },
 abrirJanelaParticipantes(taskId) {
     this.janelaParticipantesAberta = true;
-    this.buscarUsuarios(taskId); // Busca da rota listParticipantes
+    this.buscarUsuarios(taskId); 
   },
 
   async buscarUsuarios(task_id) {
     const projeto_id =  this.$route.params.id;
     try {
       const taskId = task_id;
-      // const response = await axios.get(`http://localhost:3000/project/listParticipantes/${projeto_id}`);
-      // const response = await axios.get('http://localhost:3000/profile', {
         const response = await axios.get(`http://localhost:3000/project/listParticipantes/${projeto_id}`, {
           withCredentials: true
         });
       this.listaUsuarios = response.data;
-      // console.log("listaUsuarios: ", this.listaUsuarios);
     } catch (error) {
       console.error('Erro ao buscar participantes:', error);
     }
   },
 
   async pauseTask(taskId) {
-    // console.log("taskId: ", taskId);
     if (!confirm("Tem certeza que deseja pausar esta tarefa?")) return;
     try {
       const response = await axios.post('http://localhost:3000/todos/pauseTask', {
@@ -1118,17 +971,13 @@ abrirJanelaParticipantes(taskId) {
       }, {
         withCredentials: true
       });
-      // console.log("response: ", response.data);
       this.fetchTasks();
     } catch (error) {
-      // console.error('Erro ao pausar tarefa:', error);
       alert(`Erro: ${error.response.data.error}`);
     }
   },
 
   async resumeTask(taskId) {
-    // console.log("taskId: ", taskId);
-    // if (!confirm("Tem certeza que deseja pausar esta tarefa?")) return;
     try {
       const response = await axios.put('http://localhost:3000/todos/continueTask', {
         tarefa_id: taskId.id,
@@ -1136,10 +985,6 @@ abrirJanelaParticipantes(taskId) {
       }, {
         withCredentials: true
       });
-      // console.log("response: ", response.data);
-      // element.paused = true; // Atualiza o estado local
-      // console.log("this.element: ", this.element.id);
-      // alert('Tarefa pausada com sucesso!');
       this.fetchTasks();
     } catch (error) {
       console.error('Erro ao continuar tarefa:', error);
@@ -1162,41 +1007,30 @@ abrirJanelaParticipantes(taskId) {
       const response = await axios.put('http://localhost:3000/todos/addParticipantes', payload, {
         withCredentials: true
       });
-      // console.log("response: ", response.data);
       alert('Participantes adicionados com sucesso!');
       this.janelaParticipantesAberta = false;
       this.usuariosSelecionados = [];
-      this.getParticipantes(taskId); // Atualiza a lista visível
+      this.getParticipantes(taskId); 
     } catch (error) {
-      // console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
       this.janelaParticipantesAberta = false;
     }
   },
   async removerParticipante(usuario_id, tarefa_id) {
-    // if (this.usuariosSelecionados.length <= 0){
-    //   alert("Selecione pelo menos um participante!");
-    //   return
-    // }
+
     if (!confirm("Tem certeza que deseja remover este participante?")) return;
-    // console.log("usuario_id: ", usuario_id);
-    // console.log("tarefa_id: ", tarefa_id);
     try {
       const payload = {
         projeto_id: this.$route.params.id,
         tarefa_id: tarefa_id,
         participante_id: usuario_id,
       };
-      //console.log("tarefa_id: ", );
       const response = await axios.delete('http://localhost:3000/todos/excludeParticipante', {
         data: payload,
         withCredentials: true
       });
-      // console.log("response: ", response.data);
       alert('Participante removido com sucesso!');
-      // this.janelaParticipantesAberta = false;
-      // this.usuariosSelecionados = [];
-      this.getParticipantes(tarefa_id); // Atualiza a lista visível
+      this.getParticipantes(tarefa_id); 
     } catch (error) {
       console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
@@ -1216,7 +1050,6 @@ abrirJanelaParticipantes(taskId) {
       ...list,
       items: list.items.filter(task => task.title.toLowerCase().includes(query))
     }));
-    // console.log("filtered: ", filtered);
     return filtered;
   },
   usuariosNaoParticipantes() {
@@ -1224,22 +1057,14 @@ abrirJanelaParticipantes(taskId) {
     return this.listaUsuarios.filter(u => !idsParticipantes.includes(u.usuario.usuario_id));
   },
   profileImage() {
-        // console.log("profileImage: ", this.profileImage.conteudo);
         const image = this.profileImage.conteudo;
-        // console.log("conteudo: ", image);
         if (
           this.profileImage
         ) {
           const bytes = new Uint8Array(this.profileImage.conteudo.data);
-          // console.log("bytes: ", bytes);
           const blob = new Blob([bytes], { type: this.profileImage.tipo });
-          // console.log("blob: ", blob);
           return URL.createObjectURL(blob);
-          // console.log("ẗhis.profileImage: ", this.profileImage);
         }
-
-        // imagem padrão
-        // return 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg';
       },
       
 }
@@ -1260,7 +1085,6 @@ body {
   align-items: flex-start;
   gap: 20px;
   padding: 20px;
-  /* margin-top: 20px; */
   height: 80vh; 
 }
 
@@ -1339,21 +1163,6 @@ body {
   gap: 10px;
 }
 
-/* .color-picker button {
-  background-color: #555;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #444;
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-} */
-
-/* .color-picker button:hover {
-  background-color: #555;
-} */
 .card-content {
   display: flex;
   justify-content: space-between;
@@ -1363,14 +1172,13 @@ body {
 
 .task-title {
   display: -webkit-box;
-  -webkit-line-clamp: 2;       /* máximo de 2 linhas */
+  -webkit-line-clamp: 2;       
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
-  /* color: chartreuse; */
   word-break: break-word;
-  max-width: 100%; /* ou defina uma largura específica, como 300px */
+  max-width: 100%; 
 }
 
 .dev-circles {
@@ -1380,20 +1188,16 @@ body {
   gap: 3px;
   flex-direction: row-reverse;
   justify-items: start;
-  /* border: 5px solid #000000; */
   flex-wrap: wrap;
   max-width: 100px;
   max-height: 30px;
-  /* z-index: 3000; */
-  /* overflow: auto;
-  overflow-x:visible; */
 }
 
 .dev-circle {
   width: 30px;
   height: 30px;
-  border-radius: 50%; /* Faz a bolinha redonda */
-  background-color: #194664; /* Cor da bolinha */
+  border-radius: 50%; 
+  background-color: #194664;
   color: white;
   display: flex;
   justify-content: center;
@@ -1440,11 +1244,6 @@ body {
   background-color: #f0f0f0;
 }
 
-/* .sidebar {
-  height: 82.7%;
-  margin-top: -25px;
-} */
-
 .modal-flex-container {
   display: flex;
   gap: 20px;
@@ -1452,7 +1251,6 @@ body {
   border-radius: 10px;
   padding: 20px;
   min-width: 50%;
-  /* max-width: 1100px; */
   max-width: 70%;
   margin: auto;
   overflow: auto;
@@ -1480,7 +1278,6 @@ body {
 
 .participante dl {
   list-style:circle;
-  /* cursor:no-drop; */
   margin-top: 5px;
 }
 
@@ -1518,10 +1315,10 @@ body {
   color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 600px; /* aumentei um pouco a largura para comportar 4 colunas */
+  width: 600px; 
   height: 100px;
   max-height: 90vh;
-  overflow-y: auto; /* scroll automático se passar da tela */
+  overflow-y: auto; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -1588,9 +1385,7 @@ body {
 
 .subtitle {
   margin-top: -15px;
-  /* margin-bottom: 16px; */
   font-size: 0.9em;
-  /* color: #666; */
 }
 
 .descriptionTaskElement {
@@ -1598,21 +1393,20 @@ body {
   height: 100px;
   width: 98.5%;
   border-radius: 6px;
-  white-space: pre-wrap; /* Quebra linhas em espaços e quebras de linha */
-  word-wrap: break-word; /* Quebra palavras grandes */
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
   overflow-wrap: break-word;
 }
 
 .comentario-container {
   display: flex;
   align-items: center;
-  gap: 8px; /* espaço entre círculo e input */
+  gap: 8px; 
   margin-bottom: 1rem;
   margin-top: 1px;
 }
 
 .inputModalComentario {
-  /* margin-top: -10px; */
   height: 20px;
   width: 98.5%;
   border-radius: 6px;
@@ -1624,7 +1418,6 @@ body {
   font-size: 1.3em;
 }
 
-/* Animação fade */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s;
 }
@@ -1634,7 +1427,6 @@ body {
 
 .comentarios-lista {
   margin-top: 0.5rem;
-  /* margin-top: px; */
   max-height: 350px;
   overflow-y: auto;
   padding-right: 10px;
@@ -1667,7 +1459,6 @@ body {
   justify-content: space-between;
   font-size: 0.85rem;
   margin-bottom: 4px;
-  /* background-color: #3498db; */
 }
 
 .comentario-data {
@@ -1675,12 +1466,11 @@ body {
 }
 
 .comentario-texto {
-  white-space: pre-wrap; /* Quebra linhas em espaços e quebras de linha */
-  word-wrap: break-word; /* Quebra palavras grandes */
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
   overflow-wrap: break-word;
   width: 100%;
   padding: 8px;
-  /* background-color: #ff0000; */
   border-radius: 6px;
   margin-top: 4px;
   word-break: break-word;
@@ -1714,7 +1504,6 @@ body {
 .name-project {
   position: flex;
   text-align: center;
-  /* align-items: center; */
   margin-top: -60px;
 }
 
@@ -1731,36 +1520,31 @@ body {
 
 .ql-container {
   background-color: #2f2f2f;
-  /* color: white; */
 }
 
 .ql-editor {
   padding: 10px;
   min-height: 50px;
-  white-space: pre-wrap; /* Quebra linhas em espaços e quebras de linha */
-  word-wrap: break-word; /* Quebra palavras grandes */
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
   overflow-wrap: break-word;
   width: 100%;
   padding: 8px;
-  /* background-color: #ff0000; */
   border-radius: 6px;
   margin-top: 4px;
   word-break: break-word;
   
   transition: 0.2s ease-in-out;
-  /* color: white; */
 }
 
 .ql-toolbar {
   background-color: #a0a0a0;
   border-radius: 6px;
   border: none;
-  /* color: white; */
 }
 
 .ql-toolbar.ql-snow {
   border-radius: 6px;
-  /* color: white; */
 }
 
 .ql-picker,
@@ -1773,14 +1557,13 @@ body {
 }
 
 .anexo-nome {
-  white-space: pre-wrap; /* Quebra linhas em espaços e quebras de linha */
-  word-wrap: break-word; /* Quebra palavras grandes */
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
   overflow-wrap: break-word;
   width: 250px;
 }
 
 .anexos-lista {
-  /* max-height: 120%; */
   height: 35rem;
   overflow-y: auto;
 }
@@ -1823,12 +1606,10 @@ body {
   background-color: #eee;
 }
 
-/* Ícones SVG da toolbar */
 .ql-toolbar.ql-snow .ql-stroke,
 .ql-toolbar.ql-snow .ql-fill,
 .ql-toolbar.ql-snow .ql-fill.ql-invert {
   stroke: rgb(255, 255, 255) !important;  
-  /* fill: white !important;     */
 }
 
 .pausada-overlay {
@@ -1837,7 +1618,6 @@ body {
   left: 100;
   width: 30%;
   height: 10%;
-  /* background-color: rgba(255, 255, 255, 0.7); branco translúcido */
   color: red;
   font-weight: bold;
   font-size: 1.2em;
@@ -1856,18 +1636,16 @@ body {
   height: 20px;
   margin-right: 13px;
   margin-bottom: 10px;
-  border-radius: 50%; /* Faz a bolinha redonda */
-  border: 1px solid white; /* Borda vermelha */
+  border-radius: 50%; 
+  border: 1px solid white; 
 }
 
 .devImg img{
-  /* position:fixed; */
-  /* right: 100; */
   width: 35px;
   height: 35px;
   border-radius: 50%;
 }
-/* Telas pequenas (celular) */
+
 @media (max-width: 710px) {
   .navbar {
     height: 130px;
@@ -1879,7 +1657,6 @@ body {
     flex-direction: column;
     align-items: center;
     height: auto;
-    /* margin-top: 122px; */
     overflow: auto;
   }
   .sidebar {
@@ -1889,14 +1666,7 @@ body {
   }
 }
 
-/* Telas pequenas (celular) */
 @media (max-width: 1500px) {
-  /* .board {
-    flex-direction: column;
-    align-items: center;
-    height: auto;
-    overflow: auto;
-  } */
   .sidebar {
     display: flex;
     justify-content: center;

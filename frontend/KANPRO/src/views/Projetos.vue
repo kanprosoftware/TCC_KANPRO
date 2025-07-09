@@ -1,8 +1,6 @@
 <template>
   <div>
-    <!-- Navbar separada -->
     <Navbar :search="searchQuery" @update:search="searchQuery = $event" @go-home="goToHome" />
-    <!-- Modal de criação de projeto -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal">
         <h3>Criar Novo Projeto</h3>
@@ -30,16 +28,13 @@
           </div>
         </div>
         <div class="modal-actions">
-          <!-- <button @click="confirmarCriacao">Criar</button> -->
           <button @click="criarProjetoESugerir">Criar</button>
           <button @click="fecharModal">Cancelar</button>
         </div>
       </div>
     </div>
     <div v-if="showSugestaoModal" class="modal-overlay">
-      <!-- Sujestao de devs -->
     <div class="modal">
-  <!-- Seção Sugestões de desenvolvedores -->
   <div class="flex items-center gap-2">
     <h2 class="text-lg font-semibold">
       Sugestões de desenvolvedores: 
@@ -66,7 +61,6 @@
     </label>
   </div>
 
-  <!-- Seção Outros desenvolvedores -->
   <div class="flex items-center gap-2">
     <h2 class="text-lg font-semibold">
       Outros desenvolvedores: 
@@ -93,7 +87,6 @@
     </label>
   </div>
 
-  <!-- Ações -->
   <div class="modal-actions">
     <button @click="adicionarDevsAoProjeto" :disabled="devsSelecionados.length === 0">
       Adicionar Selecionados
@@ -101,11 +94,9 @@
     <button @click="showSugestaoModal = false">Fechar</button>
   </div>
 </div>
-    <!-- acaba aqui -->
   </div>
 
     <main class="project-container">
-      <!-- Seção Meus Projetos -->
       <div class="section">
         <div class="section-header">
           <h2>Meus Projetos</h2>
@@ -137,7 +128,6 @@
         </div>
       </div>
 
-      <!-- Seção Projetos da Equipe -->
       <div class="section">
         <h2>Projetos da Equipe</h2>
         <div class="grid">
@@ -192,20 +182,16 @@ export default {
   },
   async mounted() {
     try {
-      // Buscar projetos do próprio desenvolvedor
       const userRes = await fetch(`http://localhost:3000/project/listProjectsByDevId`, {
         method: "GET",
         credentials: "include"
       });
       const userData = await userRes.json();
-      //console.log("userData", userData);
       this.userProjects = userData.map(projeto => ({
         id: projeto.projeto_id,
         name: projeto.projeto.nome,
         description: projeto.projeto.descricao
       }));
-      //console.log("userProjects", this.userProjects);
-      // Buscar projetos da equipe
       const teamRes = await fetch(`http://localhost:3000/project/listProjectsTeamByDevId`, {
         method: "GET",
         credentials: "include"
@@ -218,7 +204,6 @@ export default {
         description: projeto.projeto.descricao
       }));
       console.log("userProjects", this.userProjects);
-      // Buscar tecnologias do backend
       const techRes = await fetch('http://localhost:3000/tecnologys/listTecnologys', {
         method: "GET",
         credentials: "include"
@@ -228,10 +213,8 @@ export default {
     } catch (err) {
       console.error("Erro ao carregar projetos:", err);
       alert("Faça login para continuar")
-      // Aqui você pode redirecionar para login se quiser
       this.$router.push("/login");
     }
-    // Adicionando um listener para fechar o dropdown ao clicar fora
     document.addEventListener("click", (event) => {
       if (!this.$refs.dropdown.contains(event.target)) {
         this.showDropdown = false;
@@ -257,7 +240,7 @@ export default {
     criarProjeto() {
       const nome = prompt("Nome do novo projeto:");
       if (nome) {
-        const novoId = Date.now(); // ID temporário só para visual
+        const novoId = Date.now();
         this.userProjects.push({ id: novoId, name: nome });
       }
     },
@@ -287,7 +270,7 @@ export default {
     const payload = {
       nome: this.newProject.name,
       descricao: this.newProject.description,
-      tecnologias: this.tecnologias // já está preenchido via checkbox
+      tecnologias: this.tecnologias 
     };
 
     fetch('http://localhost:3000/project/createProject', {
@@ -295,7 +278,7 @@ export default {
       headers: {
         "Content-Type": "application/json"
       },
-      credentials: "include", // mantém o cookie de sessão
+      credentials: "include", 
       body: JSON.stringify(payload)
     })
     .then(res => {
@@ -304,37 +287,29 @@ export default {
     })
     .then(async data => {
       console.log("Projeto criado com sucesso:", data);
-      // Adiciona o novo projeto na lista visível
       const projetoId = data.projeto_id;
       this.projetoCriadoId = projetoId;
 
-      // 2. Busca sugestões de devs
       const sugestoesRes = await fetch(`http://localhost:3000/project/devSugestionProject/${projetoId}`, {
         credentials: "include"
       });
-      // const allUsersRes = await fetch(`http://localhost:3000/auth/getUsers`, {
-      //   credentials: "include"
-      // });
+
       
       
       if (!sugestoesRes.ok) throw new Error("Erro ao buscar sugestões de devs");
 
       const sugestoes = await sugestoesRes.json();
-      //const users = await allUsersRes.json();
       console.log("allUsersRes: ", sugestoes);
-      //console.log("sugestoes: ", sugestoes);
       this.devSugestoes = sugestoes.sugestaoDevs;
       this.allUsers = sugestoes.desenvolvedoresRestantes;
       this.fecharModal();
       this.showSugestaoModal = true;
 
       this.userProjects.push({
-        id: data.projeto_id || Date.now(), // ou o ID retornado
+        id: data.projeto_id || Date.now(), 
         name: payload.nome,
         description: payload.descricao
       });
-      
-      //this.fecharModal();
     })
     .catch(err => {
       console.error(err);
@@ -365,7 +340,6 @@ export default {
     } catch (error) {
       console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
-      //this.showSugestaoModal = false;
     }
   },
   confirmarExclusaoProjeto(id) {
@@ -375,7 +349,6 @@ export default {
   },
 
   async excluirProjeto(id) {
-    //const projeto_id = this.$route.params.id;
     try {
       const response = await axios.delete('http://localhost:3000/project/deleteProject', {
         data: {
@@ -387,7 +360,6 @@ export default {
 
       if (response.status != 200) throw new Error("Erro ao excluir projeto");
 
-      // Remover da lista
       this.userProjects = this.userProjects.filter(p => p.id !== id);
     } catch (err) {
       console.error("Erro ao excluir:", err);
@@ -401,7 +373,6 @@ export default {
 
 
 <style scoped>
-/* PROJETOS */
 .project-container {
   padding: 30px;
   box-sizing: border-box;
@@ -439,7 +410,7 @@ export default {
 .project-card-link {
   text-decoration: none;
   color: inherit;
-  display: block; /* garante que o link se comporte como bloco */
+  display: block; 
 }
 
 .project-card {
@@ -450,7 +421,7 @@ export default {
   text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: background 0.3s;
-  cursor: pointer; /* <-- ESSENCIAL */
+  cursor: pointer; 
   position: relative;
 }
 
@@ -481,9 +452,9 @@ export default {
   color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 600px; /* aumentei um pouco a largura para comportar 4 colunas */
+  width: 600px; 
   height: 85vh;
-  overflow-y: auto; /* scroll automático se passar da tela */
+  overflow-y: auto; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 

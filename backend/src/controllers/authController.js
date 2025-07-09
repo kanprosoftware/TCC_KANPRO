@@ -13,12 +13,10 @@ export const firstUser = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const { name, email, password, habilidades, serial } = req.body;
-    // Verifica se os campos obrigatórios foram enviados
     if (!name || !email || !password || !Array.isArray(habilidades)) {
       return res.status(400).json({ error: "Campos obrigatórios ausentes ou inválidos." });
     }
 
-    // Registra o usuário, o desenvolvedor e as habilidades
     const user = await registerUser({ name, email, password, habilidades, serial });
 
     res.status(201).json({ message: "Usuário registrado com sucesso!", user });
@@ -40,12 +38,8 @@ export const login = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-  //console.log("req.query.token", req.query.token);
-  //console.log("chamou o Controller.verifyEmail");
   try {
-    //console.log("req.query.token", req.body.token);
     const result = await verifyUserEmail(req.body.token);
-   // console.log("result", result);
     res.status(200).json({ message: "Email validado com sucesso!" });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -53,10 +47,6 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const forgotPasswordEmail = async (req, res) => {
-  // console.log("chanmou o controller forgot");
-  // console.log("--------------------------------");
-  // console.log("req.user: ", req);
-  // console.log("--------------------------------");
   try {
     const forgot = await forgotPassword(req.body.email);
     res.status(200).json({ message: "Email enviado" });
@@ -66,8 +56,6 @@ export const forgotPasswordEmail = async (req, res) => {
 }
 
 export const resetPasswordUser = async (req, res) => {
-  // console.log("Chamou o controller reset");
-  // console.log("req", req);
   try {
     const reset = await resetPassword(req.user.login_id, req.body.password);
     res.status(200).json(reset);
@@ -111,9 +99,6 @@ export const getUsers = async (req, res) => {
 }
 
 export const updateRouleUser = async (req, res) => {
-  // console.log("--------------------------------");
-  // console.log("req.user: ", req);
-  // console.log("--------------------------------");
   try {
     const updateRouleUsers = await updateRoule(req.body.usuario_id, req.body.role);
     res.status(200).json({updateRouleUsers});

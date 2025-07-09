@@ -37,13 +37,35 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Todo List API",
+      title: "KANPRO API",
       version: "1.0.0",
-      description: "API para gerenciamento de tarefas, categorias e compartilhamentos.",
+      description: `
+        API REST para do sistema KANPRO, uma plataforma de gestão de projetos e colaboração. 
+        Permite o gerenciamento de tarefas, projetos, usuários, autenticação (incluindo OAuth com Google, GitHub, Microsoft e LinkedIn), perfis de usuário, recuperação e atualização de senha, além do controle de permissões e papéis dos usuários.
+
+        Funcionalidades principais:
+        - Autenticação segura com JWT e OAuth
+        - Gerenciamento de projetos com atribuição de equipes e tecnologias
+        - Controle de perfis e habilidades dos usuários
+        - Upload e atualização de fotos de perfil
+        - Recuperação e redefinição de senhas via e-mail
+        - Atualização de informações pessoais como nome, e-mail e senha
+        - Rotas protegidas por autenticação e autorização
+      `,
+      contact: {
+        name: "KANPRO Software",
+        email: "kanprosoftware@gmail.com",
+        url: "https://github.com/kanprosoftware", 
+      },
+      license: {
+        name: "MIT",
+        url: "https://opensource.org/licenses/MIT",
+      },
     },
     servers: [
       {
         url: "http://localhost:3000",
+        description: "Servidor local de desenvolvimento",
       },
     ],
   },
@@ -56,7 +78,7 @@ const swaggerSpecs = swaggerJsdoc(options);
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:5173', // ou a porta do seu frontend
+  origin: 'http://localhost:5173', 
   credentials: true,
   exposedHeaders: ['Content-Disposition']
 }));
@@ -66,9 +88,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.APP_SECRET === "development", // true só em produção com HTTPS
-    httpOnly: true, // protege contra scripts do navegador
-    maxAge: 1000 * 60 * 60 * 24 // 1 dia
+    secure: process.env.APP_SECRET === "development", 
+    httpOnly: true, 
+    maxAge: 1000 * 60 * 60 * 24 
   }
 }));
 
@@ -96,20 +118,29 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
  * @swagger
  * tags:
  *   name: Health Check
- *   description: Rota de verificação de servidor
+ *   description: Rotas para verificação do status e saúde do servidor
  */
 
 /**
  * @swagger
  * /healthcheck:
  *   get:
- *     summary: Verifica se o servidor está no ar
+ *     summary: Verifica o status do servidor
+ *     description: Endpoint para confirmar se o servidor está ativo e respondendo.
  *     tags: [Health Check]
  *     responses:
  *       200:
- *         description: OK
+ *         description: Servidor está ativo e funcionando normalmente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "OK"
  */
-app.get('/healthcheck', (req, res) => res.send('OK! Usuario logado: ' + req.session.token));
+app.get('/healthcheck', (req, res) => res.json({ status: 'OK' }));
 
 // Inicializa servidor
 app.listen(3000, () => console.log("Server iniciou na porta 3000"));

@@ -1,11 +1,8 @@
-<!-- v-model="forgotEmail" -->
- <!-- v-if="showModal" -->
 <template>
     <div  class="modal-overlay">
       <div class="modal-content">
         <h1>Redefinir Senha</h1>
         <span class="textModal">Insira sua nova senha</span>
-        <!-- <span class="textModal">Insira seu email a baixo para receber um link e redefinir sua senha.</span> -->
         <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Nova Senha" class="input password-input" @keydown.enter="redefinir" required/>
           <div class="password-toggle" @click="togglePasswordVisibility">
               <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
@@ -198,11 +195,10 @@
   transform: translateY(-50%);
   cursor: pointer;
   color: #000000;
-  /* border: 5px solid #ccc; */
 }
 
 .password-toggle:hover i {
-  color: #808080; /* Cor do ícone quando o mouse passa sobre */
+  color: #808080; 
 }
 
 </style>

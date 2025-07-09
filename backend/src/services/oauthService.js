@@ -11,15 +11,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export const handleOAuthCallback = async ({ provider, provider_id, email, displayName }) => {
-  // console.log("email", email);
-  // console.log("provider", provider);
-  // console.log("provider_id", provider_id);
-  // console.log("displayName", displayName);
   if (!provider || !provider_id || !email) throw new Error("Dados incompletos para autenticação OAuth");
-    //console.log("Dados recebidos:", { provider, providerId, email });
   let login = await prisma.login.findFirst({ where: { email, provider, provider_id } });
-  // console.log("Login encontrado:", login);
-  // const isNew = !login;
   if (!login) {
     login = await prisma.login.create({
       data: {
@@ -52,12 +45,10 @@ export const handleOAuthCallback = async ({ provider, provider_id, email, displa
     return { login, desenvolvedor, habilidades: [], tempToken };
   } else {
     let desenvolvedor = await prisma.usuario.findFirst({ where: { login_id: login?.login_id } });
-    //console.log("Desenvolvedor encontrado:", desenvolvedor);
     let habilidades = await prisma.habilidadeUsuario.findMany({
         where: { usuario_id: desenvolvedor?.usuario_id },
         include: { tecnologia: true },
     });
-    //console.log("Habilidades encontradas:", habilidades);
     const tempToken = jwt.sign({ usuario_id: desenvolvedor.usuario_id }, process.env.JWT_SECRET, { expiresIn: "1d" });
     return { login, desenvolvedor, habilidades, tempToken };
   }

@@ -10,7 +10,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Auth
- *   description: Gerenciamento de autenticação
+ *   description: Gerenciamento de autenticação, login, registro e recuperação de senha
  */
 
 /**
@@ -86,69 +86,153 @@ router.post("/login", validate(loginSchema), login);
 
 /**
  * @swagger
- * path:
- *  /verify-email:
- *    put:
- *      summary: Verificar o e-mail do usuário
- *      description: Verifica o e-mail do usuário através de um token.
- *      tags: [Verificação de E-mail]
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                token:
- *                  type: string
- *                  description: O token de verificação do e-mail.
- *                  example: "seu-token-aqui"
- *      responses:
- *        200:
- *          description: E-mail verificado com sucesso
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  message:
- *                    type: string
- *                    example: "Email verified successfully"
- *        400:
- *          description: Erro de token inválido ou expirado
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  error:
- *                    type: string
- *                    example: "Invalid or expired token"
- *        401:
- *          description: Token não fornecido
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  error:
- *                    type: string
- *                    example: "Access token is required"
- *        403:
- *          description: Token inválido ou payload do token incorreto
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  error:
- *                    type: string
- *                    example: "Invalid token payload"
+ * /auth/verify-email:
+ *   put:
+ *     summary: Verificar o e-mail do usuário
+ *     description: Verifica o e-mail do usuário através de um token.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: O token de verificação do e-mail.
+ *                 example: "seu-token-aqui"
+ *     responses:
+ *       200:
+ *         description: E-mail verificado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email verified successfully"
+ *       400:
+ *         description: Erro de token inválido ou expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid or expired token"
+ *       401:
+ *         description: Token não fornecido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Access token is required"
+ *       403:
+ *         description: Token inválido ou payload do token incorreto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid token payload"
  */
 router.post("/verify-email", verifyEmail);
 
+/**
+ * @swagger
+ * /auth/forgotPasswordEmail:
+ *   post:
+ *     summary: Solicitar recuperação de senha
+ *     description: Envia um e-mail com link para redefinir a senha do usuário.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: E-mail do usuário que deseja redefinir a senha
+ *                 example: "usuario@kanpro.com"
+ *     responses:
+ *       200:
+ *         description: E-mail enviado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email enviado"
+ *       404:
+ *         description: E-mail não encontrado ou erro ao enviar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Email não encontrado!"
+ */
 router.post("/forgotPasswordEmail", forgotPasswordEmail);
 
+/**
+ * @swagger
+ * /auth/resetPasswordUser:
+ *   put:
+ *     summary: Redefinir a senha do usuário
+ *     description: Atualiza a senha do usuário com base no token temporário de autenticação.
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: Nova senha do usuário
+ *                 example: "novaSenhaSegura123"
+ *     responses:
+ *       200:
+ *         description: Senha atualizada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 login_id:
+ *                   type: string
+ *                   example: "clz9999ff0001ws31sa2cc6p3"
+ *                 email:
+ *                   type: string
+ *                   example: "usuario@kanpro.com"
+ *       400:
+ *         description: Erro ao atualizar a senha
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erro ao atualizar a senha!"
+ */
 router.put("/resetPasswordUser", authenticateTempToken, resetPasswordUser);
 
 /**
@@ -219,8 +303,113 @@ router.get("/primeiroUser", firstUser)
  */
 router.get('/getUsers', authenticateToken, getUsers);
 
+/**
+ * @swagger
+ * /auth/updateRouleUser:
+ *   put:
+ *     summary: Atualizar papel do usuário
+ *     description: Atualiza o campo de role (papel) de um usuário específico.
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - usuario_id
+ *               - role
+ *             properties:
+ *               usuario_id:
+ *                 type: string
+ *                 description: ID do usuário a ter a role atualizada
+ *                 example: "clz9999ff0001ws31sa2cc6p3"
+ *               role:
+ *                 type: string
+ *                 description: "Novo papel do usuário (ex: ADMIN, USER, etc.)"
+ *                 example: "ADMIN"
+ *     responses:
+ *       200:
+ *         description: Papel do usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 updateRouleUsers:
+ *                   type: object
+ *                   properties:
+ *                     usuario_id:
+ *                       type: string
+ *                       example: "clz9999ff0001ws31sa2cc6p3"
+ *                     roule:
+ *                       type: string
+ *                       example: "ADMIN"
+ *       500:
+ *         description: Erro ao atualizar papel do usuário
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensagem:
+ *                   type: string
+ *                   example: "Erro ao atualizar regra de usuario"
+ */
 router.put('/updateRouleUser', authenticateToken, updateRouleUser);
 
+/**
+ * @swagger
+ * /auth/disableUserById:
+ *   put:
+ *     summary: Desativar usuário
+ *     description: Desativa um usuário no sistema (define o campo "ativo" como false).
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - usuario_id
+ *             properties:
+ *               usuario_id:
+ *                 type: integer
+ *                 description: ID do usuário que será desativado
+ *                 example: 123
+ *     responses:
+ *       200:
+ *         description: Usuário desativado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 disableUserId:
+ *                   type: object
+ *                   properties:
+ *                     login_id:
+ *                       type: integer
+ *                       example: 123
+ *                     ativo:
+ *                       type: boolean
+ *                       example: false
+ *       500:
+ *         description: Erro ao desativar o usuário
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensagem:
+ *                   type: string
+ *                   example: "Erro ao desativar usuario"
+ */
 router.put('/disableUserById', authenticateToken, disableUserById);
 
 export default router;

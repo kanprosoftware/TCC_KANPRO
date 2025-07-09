@@ -4,7 +4,6 @@
       <Sidebar @navigate="handleSidebarClick" />
     </div>
     <div class="page-title">
-        <!-- <h1 class="name-project" v-if="nameProject()">{{this.namedProject}}</h1> -->
         <h1 style="color: white">Recursos do Projeto</h1>
     </div>
 </template>
@@ -20,14 +19,12 @@ export default {
 </script>
 <style scoped>
 .sidebar {
-    /* margin-top: 15px; */
     margin-top: 13px;
 }
 
 .page-title {
   position: flex;
   text-align: center;
-  /* align-items: center; */
   margin-top: -80px;
 }
 </style>

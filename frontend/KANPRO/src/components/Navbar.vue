@@ -12,7 +12,7 @@
         />
       </div>
       <div class="nav-center">
-        <slot name="titulo"></slot> <!-- Aqui é o espaço preenchido por outros -->
+        <slot name="titulo"></slot>
       </div>
       <div class="nav-right">
         <div class="user-menu" ref="menu" @click="toggleDropdown">
@@ -20,7 +20,6 @@
 
           <div class="dropdown" v-if="showDropdown">
             <a @click.prevent="goToProfile">Perfil</a>
-            <!-- <a href="#">Gerenciar conta</a> -->
             <a href="/permissoes" v-if="showPermission">Permissões</a>
             <a href="#" @click.prevent="logout">Logout</a>
           </div>
@@ -45,14 +44,9 @@
         profileImage: '',
       };
     },
-    // watch: {
-    //   userRole(novo) {
-    //     this.showPermission = ['super', 'admin', 'gestor'].includes(novo);
-    //   }
-    // },
     watch: {
       '$route.path'() {
-        this.searchQuery = ""; // limpa busca ao trocar de tela
+        this.searchQuery = ""; 
       },
       search(newVal) {
         this.searchQuery = newVal;
@@ -84,17 +78,16 @@
         }
       },
       async logout() {
-        console.log("Logout clicado"); // <-- TESTE
+        console.log("Logout clicado"); 
         try {
           const response = await fetch("http://localhost:3000/auth/logout", {
             method: "POST",
-            credentials: "include" // garante que cookies sejam enviados
+            credentials: "include" 
           });
   
           if (response.ok) {
             const jsonResponse = await response.json();
       
-            // Aqui você pode fazer algo com o jsonResponse, por exemplo, logar no consol
             window.location.href = "/";
           } else {
             const jsonResponse = await response.json();
@@ -112,7 +105,7 @@
             withCredentials: true
           });
           console.log("responseNavBar: ", response.data);
-          this.userRole = response.data.roule; // ajuste conforme a estrutura da resposta
+          this.userRole = response.data.roule; 
           this.profileImage = response.data.login.profile_image;
         } catch (error) {
           console.error('Erro ao buscar role do usuário:', error);
@@ -149,11 +142,8 @@
           const blob = new Blob([bytes], { type: this.profileImage.tipo });
           console.log("blob: ", blob);
           return URL.createObjectURL(blob);
-          // console.log("ẗhis.profileImage: ", this.profileImage);
         }
 
-        // imagem padrão
-        // return 'https://st4.depositphotos.com/11574170/25191/v/450/depositphotos_251916955-stock-illustration-user-glyph-color-icon.jpg';
       }
     }
   };
@@ -165,17 +155,9 @@
     color: white;
     padding: 12px 20px;
     display: flex;
-    /* position: fixed;
-    top: 0;
-    left: 0; */
     justify-content: space-between;
     align-items: center;
     width: 97.3%;
-    /* width: 99.2%; */
-    /* box-sizing: content-box; */
-    /* margin-top: -8px; */
-    /* margin-left: -8px; */
-    /* box-sizing: border-box; */
   }
   
   
@@ -248,18 +230,11 @@
     background: #444;
   }
 
-    /* Telas pequenas (celular) */
 @media (max-width: 1017px) {
   .navbar {
     width: 30%;
   }
 }
-
-/* @media (max-width: 710px) {
-  .navbar {
-    height: 100%;
-  }
-} */
 
 @media (max-width: 1500px) {
   .navbar {

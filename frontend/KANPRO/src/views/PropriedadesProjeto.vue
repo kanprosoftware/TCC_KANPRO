@@ -4,12 +4,10 @@
       <Sidebar @navigate="handleSidebarClick" />
     </div>
     <div class="page-title">
-        <!-- <h1 class="name-project" v-if="nameProject()">{{this.namedProject}}</h1> -->
         <h1 style="color: white">Propriedades do Projeto</h1>
     </div>
     <div class="profile-container">
       <div class="profile-card">
-        <!-- <h1 class="title">Perfil</h1> -->
   
         <div class="form">
           <div class="form-group">
@@ -64,7 +62,6 @@
                 </div>
             </div>
 
-          <!-- Exibição normal (sem edição) -->
 <div class="form-group" v-if="!editandoTecnologias">
   <label>Tecnologias:</label>
   <div class="tecnologia-tags-container">
@@ -78,7 +75,6 @@
 </div>
 
 
-<!-- Edição -->
 <div class="form-group" v-else>
   <label>Tecnologias:</label>
   <div class="tecnologia-tags-container">
@@ -92,7 +88,6 @@
         {{ tec.descricao }}
       </label>
     </div>
-    <!-- Botões no mesmo lugar do botão de editar -->
     <div class="botoes-editar">
       <button class="botao-editar" @click="salvarTecnologias">💾</button>
       <button class="botao-editar" @click="cancelarEdicaoTecnologias">❌</button>
@@ -113,7 +108,6 @@
         {{ console.log("p: ", p) }}
       <span class="nome-participante">{{ p.usuario.nome }}</span>
       <div class="acoes-participante">
-        <!-- <button @click="abrirPermissoes(p)">Permissões</button> -->
         <button @click="confirmarRemocao(p)">Remover</button>
       </div>
     </div>
@@ -121,15 +115,6 @@
 </div>
 <div v-if="showSugestaoModal" class="modal-overlay">
     <div class="modal">
-      <!-- Cabeçalho -->
-      <!-- <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Adicionar desenvolvedores</h2>
-        <button class="text-gray-500 hover:text-red-600" @click="fecharModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div> -->
-
-      <!-- Sugestões de Desenvolvedores -->
       <div class="flex items-center gap-2 mb-2">
         <h2 class="text-lg font-semibold">
           Sugestões de desenvolvedores:
@@ -156,7 +141,6 @@
         </label>
       </div>
 
-      <!-- Outros Desenvolvedores -->
       <div class="flex items-center gap-2 mt-4 mb-2">
         <h2 class="text-lg font-semibold">
           Outros desenvolvedores:
@@ -183,7 +167,6 @@
         </label>
       </div>
 
-      <!-- Ações -->
       <div class="modal-actions mt-4">
         <button @click="adicionarDevsAoProjeto" :disabled="devsSelecionados.length === 0">
           Adicionar Selecionados
@@ -208,19 +191,19 @@
         },
         data() {
             return {
-                nomeProjeto: '',       // nome salvo
-                novoNomeProjeto: '',   // edição temporária
+                nomeProjeto: '',       
+                novoNomeProjeto: '',   
                 editandoNomeProjeto: false,
-                descricaoProjeto: '',       // nome salvo
-                novaDescricaoProjeto: '',   // edição temporária
+                descricaoProjeto: '',       
+                novaDescricaoProjeto: '', 
                 editandoDescricaoProjeto: false,
                 todasTecnologias: [],
-                tecnologiasSelecionadas: [], // Estado atual
-                tecnologiasBackup: [], // Armazena backup durante edição
+                tecnologiasSelecionadas: [],
+                tecnologiasBackup: [], 
                 editandoTecnologias: false,
                 participantes: [],
                 tecnologias: [],
-                idProjeto: 87, // Substitua com a lógica correta para obter o ID do projeto atual
+                idProjeto: 87, 
                 showSugestaoModal: false,
                 devSugestoes: [],
                 allUsers: [],
@@ -260,13 +243,11 @@
                     this.tecnologias = response.data.tecnologias;
                 } catch (error) {
                     alert("Faça login para continuar")
-                    // Aqui você pode redirecionar para login se quiser
                     this.$router.push("/login");
                 }
             },
             async salvarNomeProjeto() {
                 console.log("this.nomeNomeProjeto: ", this.novoNomeProjeto);
-                // this.nomeProjeto = this.novoNomeProjeto;
                 this.editandoNomeProjeto = false;
                 const response = await axios.put(`http://localhost:3000/project/updateNameProject`, {
                     projeto_id: this.$route.params.id,
@@ -282,9 +263,6 @@
             async salvarDescricaoProjeto() {
                 
                 this.editandoDescricaoProjeto = false;
-                // console.log("this.nomeNomeProjeto: ", this.novoNomeProjeto);
-                // this.nomeProjeto = this.novoNomeProjeto;
-                // this.editandoNomeProjeto = false;
                 const response = await axios.put(`http://localhost:3000/project/updateDescriptionProject`, {
                     projeto_id: this.$route.params.id,
                     descricaoProjeto: this.descricaoProjeto,
@@ -298,7 +276,7 @@
             },
             editarTecnologias() {
                 this.tecnologiasSelecionadas = this.tecnologias.map(t => t.tecnologia_id);
-                this.tecnologiasBackup = [...this.tecnologiasSelecionadas]; // cria backup antes de editar
+                this.tecnologiasBackup = [...this.tecnologiasSelecionadas]; 
                 this.editandoTecnologias = true;
             },
             async salvarTecnologias() {
@@ -313,7 +291,7 @@
                 this.buscarDetalhesProjeto();
             },
             cancelarEdicaoTecnologias() {
-                this.tecnologiasSelecionadas = [...this.tecnologiasBackup]; // restaura do backup
+                this.tecnologiasSelecionadas = [...this.tecnologiasBackup]; 
                 this.editandoTecnologias = false;
             },
             async buscarParticipantes() {
@@ -328,7 +306,6 @@
     }
   },
             async confirmarRemocao(participante) {
-                //console.log("participante: ", participante)
             const confirmacao = confirm(`Deseja realmente remover participante do projeto?`);
             if (!confirmacao) return;
 
@@ -344,7 +321,6 @@
             console.log("responseDeleteUser: ", response);
             if (response.statusText != "OK") throw new Error("Erro ao remover participante.");
             alert("Participante removido com sucesso!");
-            // Recarrega a lista
             this.buscarParticipantes();
             } catch (error) {
             console.error("Erro ao remover participante:", error);
@@ -352,27 +328,19 @@
   },
 
   abrirPermissoes(participante) {
-    // Abre modal ou redireciona para tela de permissões
     alert(`Abrir permissões para ${participante.nome}`);
   },
 
   async adicionarParticipanteModal() {
-    // Abre modal ou redireciona para tela de adicionar participante
-    // alert("Abrir modal de adicionar participante");
     const sugestoesRes = await fetch(`http://localhost:3000/project/devSugestionProject/${this.$route.params.id}`, {
         credentials: "include"
       });
-      // const allUsersRes = await fetch(`http://localhost:3000/auth/getUsers`, {
-      //   credentials: "include"
-      // });
       
       
       if (!sugestoesRes.ok) throw new Error("Erro ao buscar sugestões de devs");
 
       const sugestoes = await sugestoesRes.json();
-      //const users = await allUsersRes.json();
       console.log("allUsersRes: ", sugestoes);
-      //console.log("sugestoes: ", sugestoes);
       this.devSugestoes = sugestoes.sugestaoDevs;
       this.allUsers = sugestoes.desenvolvedoresRestantes;
     this.showSugestaoModal = true;
@@ -403,7 +371,6 @@
     } catch (error) {
       console.error('Erro ao adicionar participantes:', error);
       alert(`Erro: ${error.response.data.error}`);
-      //this.showSugestaoModal = false;
     }
   },
   
@@ -412,24 +379,20 @@
 </script>
 <style scoped>
 .sidebar {
-    /* margin-top: 15px; */
     margin-top: 13px;
 }
 
 .page-title {
   position: flex;
   text-align: center;
-  /* align-items: center; */
   margin-top: -80px;
 }
 .profile-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* height: 500px; */
     background: transparent ;
     margin-top: 56px;
-    /* overflow: auto; */
   }
   
   .profile-card {
@@ -439,8 +402,6 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
     text-align: center;
     width: 100%;
-    /* max-width: 800px; */
-    /* max-height: 450px; */
     height: 549px;
     display: flex;
     flex-direction: column;
@@ -508,9 +469,9 @@
 }
 
 .input {
-  flex-shrink: 0;       /* impede o input de encolher */
-  width: 100%;          /* ocupa todo o espaço possível */
-  max-width: 400px;     /* limite máximo para manter o layout controlado */
+  flex-shrink: 0;       
+  width: 100%;          
+  max-width: 400px;     
   padding: 10px 15px;
   margin: 10px 0;
   border: none;
@@ -526,7 +487,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 12px;  /* espaçamento entre o input e os botões */
+  margin-left: 12px; 
   flex-shrink: 0;
 }
 
@@ -536,7 +497,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: -40px;  /* espaçamento entre o input e os botões */
+  margin-left: -40px;  
   flex-shrink: 0;
 }
 
@@ -571,30 +532,27 @@
   display: flex;
   position:relative;
   flex-wrap: wrap;
-  /* left: -60px; */
   width: 900px;
   gap: 8px;
-  border: 1px solid transparent;          /* borda padrão */
-  border-radius: 6px;              /* borda arredondada igual inputs */
+  border: 1px solid transparent;          
+  border-radius: 6px;             
   padding: 5px 10px;
-  margin: 10px;               /* espaço interno para "respirar" */
-  background-color: #444;          /* mesma cor de fundo dos inputs */
-  min-height: 38px;                /* altura mínima semelhante a input */
-  cursor: default;                 /* cursor padrão, não editável */
-  box-sizing: border-box;          /* para padding não aumentar tamanho */
-  flex-shrink: 0;       /* impede o input de encolher */
-  width: 100%;          /* ocupa todo o espaço possível */
-  max-width: 430px;     /* limite máximo para manter o layout controlado */
+  margin: 10px;              
+  background-color: #444;         
+  min-height: 38px;               
+  cursor: default;                 
+  box-sizing: border-box;         
+  flex-shrink: 0;      
+  width: 100%;          
+  max-width: 430px;     
 }
 
 .tecnologia-tags-container {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   position: relative;
   gap: 1px;
   width: 123%;
-  /* max-width: 3000px; */
   margin-left: -60px;
 }
 
@@ -624,7 +582,6 @@
   }
 
 .checkbox-list {
-    /* flex-direction: column; */
     columns: 4;
   display: flex;
   flex-wrap: wrap;
@@ -636,9 +593,7 @@
   margin-left: 10px;
   margin-top: 10px;
   width: 87%;
-  /* max-width: 1000px; */
   box-sizing: border-box;
-  /* flex: 1; */
 }
 
 .checkbox-item {
@@ -659,17 +614,10 @@
   justify-content: space-between;
   align-items: center;
   width: 380px;
-  /* margin-left: -10px; */
   margin-bottom: 10px;
 }
 
 .botao-adicionar {
-  /* background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer; */
   margin-left: 8px;
   background-color: #666;
   border: none;
@@ -725,9 +673,9 @@
   color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 600px; /* aumentei um pouco a largura para comportar 4 colunas */
+  width: 600px; 
   height: 85vh;
-  overflow-y: auto; /* scroll automático se passar da tela */
+  overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -779,9 +727,8 @@
 }
 
 .modal-checkbox-label {
-  /* display: flex; */
   align-items: center;
-  gap: 8px; /* espaço entre checkbox e nome */
+  gap: 8px; 
   cursor: pointer;
 }
 

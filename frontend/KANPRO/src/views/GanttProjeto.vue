@@ -18,9 +18,9 @@ import * as d3 from 'd3'
 import Navbar from "../components/Navbar.vue";
 import Sidebar from '../components/Sidebar.vue';
 import axios from 'axios'
-import { useRoute } from 'vue-router'  // Importa o useRoute
+import { useRoute } from 'vue-router'  
 
-const route = useRoute()  // Usa o composable para acessar a rota
+const route = useRoute()  
 
 const chart = ref(null)
 const tarefas = ref([])
@@ -38,24 +38,22 @@ onMounted( async () => {
           },
           withCredentials: true
     });
-    // const response = await fetch('http://localhost:3000/tarefas') // Substitua pela sua URL real
-    // const data = await response.json()
+
     console.log('Tarefas recebidas:', response.data);
-    // console.log('Tarefas recebidas:', tarefas.value);
-    // Transforma os campos de data em objetos Date
-    tarefas.value = [] // Limpa antes
+
+    tarefas.value = [] 
     console.log("tarefas.value: ", response.data);
     if (response.data.length === 0) {
       console.log("tarefas.value.length: ", response.data.length);
       const hoje = new Date()
       hoje.setHours(0, 0, 0, 0)
 
-      tarefas.value = [] // deixa vazio mesmo
+      tarefas.value = [] 
 
       let startDate = new Date(hoje)
       console.log("startDate: ", startDate);
       let endDate = new Date(hoje)
-      endDate.setDate(endDate.getDate() + 34) // 5 semanas = 35 dias
+      endDate.setDate(endDate.getDate() + 34) 
       
     } else { 
         response.data.forEach(t => {
@@ -74,7 +72,6 @@ onMounted( async () => {
           return
         }
 
-        // Parte 1: início até primeira pausa
         tarefas.value.push({
           id: t.tarefa_id,
           name: t.titulo ,
@@ -83,7 +80,6 @@ onMounted( async () => {
           colorBar: t.colorBar,
         })
 
-        // Entre pausas
         for (let i = 0; i < pausasOrdenadas.length - 1; i++) {
           const fimAtual = pausasOrdenadas[i].fimPausa
           const inicioProx = pausasOrdenadas[i + 1].inicioPausa
@@ -99,7 +95,6 @@ onMounted( async () => {
           }
         }
 
-        // Último trecho: fim da última pausa até concludeAt
         const ultimaPausa = pausasOrdenadas[pausasOrdenadas.length - 1]
         if (ultimaPausa.fimPausa) {
           tarefas.value.push({
@@ -112,7 +107,7 @@ onMounted( async () => {
         }
       })
       }
-    // console.log("tarefas: ", tarefas.value);
+
   } catch (error) {
     console.error('Erro ao buscar tarefas:', error)
     return
@@ -127,8 +122,7 @@ onMounted( async () => {
 
   
   let startDate, endDate;
-  
-  // Determina os limites com base nas tarefas
+
   if (tarefas.value.length === 0) {
     const hoje = new Date()
     hoje.setHours(0, 0, 0, 0)
@@ -137,21 +131,16 @@ onMounted( async () => {
     endDate.setDate(endDate.getDate() + 28)
   } else { 
     const taskStart = d3.min(tasks, d => d.start.toISOString().split('T')[0])
-  //const dateString = taskStart.toISOString().split('T')[0];
-  // console.log("taskStart: ", taskStart);
-  const taskEnd = d3.max(tasks, d => d.end.toISOString().split('T')[0])
-  
-  // console.log("taskEnd: ", taskEnd);
 
-  // Garante que a contagem de semanas comece no início da primeira tarefa
+  const taskEnd = d3.max(tasks, d => d.end.toISOString().split('T')[0])
+
   startDate = new Date(taskStart)
-  // console.log("statDate: ", startDate);
+
   endDate = new Date(taskEnd)
-  // console.log("calcula: ", (endDate - startDate));
   if ((endDate - startDate) < 1814400000) {
-     endDate.setDate(endDate.getDate() + (28 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
+     endDate.setDate(endDate.getDate() + (35 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) 
   } else {
-    endDate.setDate(endDate.getDate() + (14 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) // fecha semana cheia
+    endDate.setDate(endDate.getDate() + (14 - (d3.timeDay.count(startDate, endDate) % 7 || 7))) 
   }
 }
 
@@ -170,7 +159,6 @@ onMounted( async () => {
     .attr('width', width)
     .attr('height', height)
 
-  // Fundo branco
   svg.append('rect')
     .attr('width', width)
     .attr('height', height)
@@ -184,7 +172,6 @@ onMounted( async () => {
 
   const days = d3.timeDay.range(startDate, endDate)
 
-  // Criar semanas fixas de 7 dias
   const weekCount = Math.ceil(totalDays / 7)
   const weeks = Array.from({ length: weekCount }, (_, i) => {
     const weekStart = new Date(startDate)
@@ -197,7 +184,6 @@ onMounted( async () => {
   const months = d3.groups(days, d => `${d.getFullYear()}-${d.getMonth()}`)
 
 
-  // Linhas verticais dos dias
   svg.selectAll('.day-line')
     .data(days)
     .enter()
@@ -210,17 +196,16 @@ onMounted( async () => {
 svg.selectAll('.week-bg')
   .data(weeks)
   .enter()
-  .insert('rect', '.week-label') // insere atrás do texto
-//   .append('rect')
+  .insert('rect', '.week-label') 
+
   .attr('x', d => x(d.start))
   .attr('y', 25)
   .attr('width', dayWidth * 7)
   .attr('height', 20)
   .attr('fill', 'white')
-  .attr('stroke', '#ccc')      // cor do contorno
-  .attr('stroke-width',2)    // largura do contorno
+  .attr('stroke', '#ccc')     
+  .attr('stroke-width',2)   
 
-  // Nome das semanas
   svg.selectAll('.week-label')
     .data(weeks)
     .enter()
@@ -229,7 +214,7 @@ svg.selectAll('.week-bg')
     .attr('y', 40)
     .attr('text-anchor', 'middle')
     .text(d => `Semana ${d.number}`)
-  // Linhas das semanas (mais grossas)
+
   svg.selectAll('.week-line')
     .data(weeks)
     .enter()
@@ -241,23 +226,18 @@ svg.selectAll('.week-bg')
     .attr('stroke', '#ccc')
     .attr('stroke-width', 2)
 
-  // Linhas dos meses (grossas)
- 
-// Fundo branco para o cabeçalho dos meses
+
 svg.selectAll('.month-bg')
   .data(months)
   .enter()
-  .insert('rect', '.month-label') // insere antes dos textos do mês
+  .insert('rect', '.month-label') 
   .attr('class', 'month-bg')
   .attr('x', ([_, values]) => x(values[0]))
   .attr('y', 5)
   .attr('width', ([_, values]) => values.length * dayWidth)
   .attr('height', 20)
   .attr('fill', '#5bff9a')
-  // .attr('stroke', '#333')      // cor do contorno
-  // .attr('stroke-width',3)    // largura do contorno
 
-  // Nome dos meses
   svg.selectAll('.month-label')
     .data(months)
     .enter()
@@ -265,8 +245,7 @@ svg.selectAll('.month-bg')
     .attr('x', ([_, values]) => x(values[0]) + (values.length * dayWidth) / 2)
     .attr('y', 20)
     .attr('text-anchor', 'middle')
-    
-    // .text(([month]) => d3.timeFormat('%B')(new Date(2025, month, 1)))
+
     .text(([_, values]) => {
     const sampleDate = values[0]
     const label = sampleDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
@@ -286,20 +265,6 @@ svg.selectAll('.month-bg')
     .attr('stroke', '#333')
     .attr('stroke-width', 3)
     
-// Fundo branco para o cabeçalho das semanas
-
-    // Linhas das semanas (mais grossas)
-//   svg.selectAll('.week-line')
-//     .data(weeks)
-//     .enter()
-//     .append('line')
-//     .attr('x1', d => x(d.start))
-//     .attr('x2', d => x(d.start))
-//     .attr('y1', 0)
-//     .attr('y2', height)
-//     .attr('stroke', '#ccc')
-//     .attr('stroke-width', 2)
-// Fundo branco para os dias
 svg.selectAll('.day-bg')
   .data(days)
   .enter()
@@ -310,7 +275,6 @@ svg.selectAll('.day-bg')
   .attr('height', 20)
   .attr('fill', 'white')
 
-  // Números dos dias
   svg.selectAll('.day-label')
   .data(days)
   .enter()
@@ -320,11 +284,11 @@ svg.selectAll('.day-bg')
   .attr('text-anchor', 'middle')
   .attr('font-size', '10px')
   .text(d => {
-    const diaSemana = d.toLocaleDateString('pt-BR', { weekday: 'short' }) // ex: "dom", "seg"
+    const diaSemana = d.toLocaleDateString('pt-BR', { weekday: 'short' }) 
     const dia = d.getDate()
     return `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)} ${dia}`
   })
-  // Barras das tarefas
+
   const taskGroups = Array.from(new Set(tasks.map(t => t.id)))
   const taskYMap = {}
     let currentIndex = 0
@@ -344,7 +308,7 @@ svg.selectAll('.day-bg')
     .attr('fill', '#3B82F6')
     .attr('rx', 4)
 
-  // Nomes das tarefas
+
   svg.selectAll('.task-label')
     .data(tasks)
     .enter()
@@ -364,9 +328,7 @@ svg.selectAll('.day-bg')
 .name-page {
   position: flex;
   text-align: center;
-  /* font-size: 32px; */
   font-size: 141%;
-  /* align-items: center; */
   margin-top: -60px;
 }
 .gantt-wrapper {

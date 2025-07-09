@@ -7,7 +7,6 @@
       </li>
       <li @click.prevent="mostrarArquivos" class="menu-item">📁 Arquivos do Projeto</li>
       <li @click.prevent="propriedadesProjeto" class="menu-item">⚙️ Propriedades do Projeto</li>
-      <!-- <li @click.prevent="recursosProjeto">👥 Recursos</li> -->
       <li @click.prevent="ganttProjeto" class="menu-item">📊 Gantt</li>
     </ul>
     <div v-else>
@@ -24,9 +23,6 @@
       </div>
       <div class="span"><h3>Arquivos do projeto</h3></div>
       <ul class="file-list">
-        <!-- <li v-for="(arquivo, index) in arquivos" :key="index" class="file-item">
-          📄 {{ arquivo.nome }}
-        </li> -->
         <li 
               v-for="arquivo in attachments"
               :key="arquivo.anexo_id"
@@ -68,11 +64,6 @@ export default {
   data() {
     return {
       modoArquivosAtivo: false,
-      // arquivos: [
-      //   { nome: 'Requisitos.pdf' },
-      //   { nome: 'Planejamento.xlsx' },
-      //   { nome: 'Apresentacao.pptx' }
-      // ]
       attachments: [],
     }
   },
@@ -87,15 +78,11 @@ export default {
       this.modoArquivosAtivo = true;
     },
     openFileDialog() {
-      this.$refs.fileInput.click(); // Abre o seletor de arquivo
+      this.$refs.fileInput.click(); 
     },
     onFileChange(event) {
-      //console.log("chamou OnFileChange");
       const selectedFiles = Array.from(event.target.files);
-      //console.log("selectedFiles: ", selectedFiles);
       if (selectedFiles) {
-        //console.log("entrou no if");
-        //this.file = selectedFiles;
         this.uploadFile(selectedFiles);
       }
     },
@@ -106,30 +93,28 @@ export default {
           params: {
             projeto_id: this.$route.params.id,
           },
-          responseType: 'blob', // importante para arquivos binários
+          responseType: 'blob', 
           withCredentials: true
         });
-        //const data = await response.json();
-        //console.log("response file: ", response.headers['content-disposition']);
         const contentType = response.headers['content-type'];
         const contentDispositions = response.headers['content-disposition'];
-        // Cria um link temporário com o blob
+
         const blob = new Blob([response.data], { type: response.headers['content-type'] });
         const url = URL.createObjectURL(blob);
         const isInlineType = contentType.startsWith('image/') || contentType === 'application/pdf';
         if (isInlineType) {
-          // Abre o arquivo diretamente em uma nova aba
+
           const response = await axios.get(`http://localhost:3000/project/downloadAttachment/${attachmentId}&inline=true`, {
             params: {
               projeto_id: this.$route.params.id,
             },
-            responseType: 'blob', // importante para arquivos binários
+            responseType: 'blob',
             withCredentials: true
           });
-          // console.log("response file: ", response);
+
           window.open(response.request.responseURL, '_blank');
         } else {
-          // Cria o elemento <a> para forçar download
+
           const link = document.createElement('a');
           link.href = url;
 
@@ -142,21 +127,17 @@ export default {
         }
         URL.revokeObjectURL(url);
       } catch (error) {
-        // alert(`Erro: ${error.response.data.error}`);
         console.error('Erro ao baixar arquivo:', error);
       }
     },
     async uploadFile(files) {
       console.log("chamou UploadFile");
-      // console.log("element: ", this.element.id)
       const formData = new FormData();
 
-      // formData.append("tarefa_id", this.element.id);     // por exemplo, tarefaId = 1
-      formData.append("projeto_id", this.$route.params.id);   // por exemplo, projetoId = 2
+      formData.append("projeto_id", this.$route.params.id);   
 
-      // Adiciona os arquivos (vários, com mesmo nome "arquivos")
       for (const file of files) {
-        formData.append("arquivos", file); // "arquivos" é o mesmo nome usado no multer
+        formData.append("arquivos", file); 
       }
       console.log("response files : ");
 
@@ -167,13 +148,8 @@ export default {
           { withCredentials: true }
         );
         await this.listAttachments(this.$route.params.id);
-        //await this.fetchComments(taskId);
-        //console.log("response files : ", response);
-        //const data = await response.json();
-        //console.log("data: ", data);
         if (response.status == 201) {
           alert('Arquivo enviado com sucesso!');
-          // Aqui você pode atualizar o estado com o novo arquivo
         } else {
           alert('Erro no envio do arquivo.');
         }
@@ -188,14 +164,11 @@ export default {
     },
     async   listAttachments() {
       try {
-        //const response = await fetch(`http://localhost:3000/todos/getComments/${todoId}`);
         const response = await axios.get(`http://localhost:3000/project/listAttachment/${this.$route.params.id}`, {
           withCredentials: true
         });
         console.log("response attach: ", response.data);
-        //const data = await response.json();
         this.attachments = response.data;
-        //console.log("comments: ", data);
       } catch (error) {
         console.error('Erro ao buscar anexos:', error);
       }
@@ -322,8 +295,6 @@ export default {
 .span {
   align-items: center;
   display: flex;
-  /* justify-content: space-between; */
-  /* align-items: end; */
   justify-content:center;
   margin-top: -20px;
   margin-bottom: -20px;
@@ -331,11 +302,7 @@ export default {
 
 @media (max-width: 1500px) {
   .sidebar {
-    /* display: flex;
-    justify-content: center;
-    align-items: flex-start; */
     position: relative;
-    /* margin-top: 122px; */
     height: 265px;
     width: 300px;
   }
@@ -344,7 +311,6 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 10 10px;
-    /* margin-bottom: 12px; */
     margin-top: 5px;
   }
 }

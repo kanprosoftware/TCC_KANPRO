@@ -6,8 +6,8 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     service: 'gmail',
   auth: {
-    user: "canjunior15@gmail.com",   // google app email
-    pass: "kifh vtow okiv actq",   // google app password
+    user: "canjunior15@gmail.com",   
+    pass: "kifh vtow okiv actq",   
   },
 });
 
@@ -19,12 +19,9 @@ export const findTotalUsers = async () => {
   else {
     return false;
   }
-  //return totalUsuarios;
 };
 
 export const registerUser = async ({ name, email, password, habilidades, serial }) => {
- // console.log("chamou a funcao Service.register");
-  //console.log("Registering user:", { name, email, password, habilidades, serial});
   const hashedPassword = await bcrypt.hash(process.env.HASH_SECRET + password, 10);
   let login;
   let user;
@@ -43,13 +40,10 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
       },
     });
 
-    //console.log("login", login);
-
-    // Criando o Desenvolvedor, com a relação ao Login
     user = await prisma.usuario.create({
       data: {
         nome: name,
-        login_id: login.login_id, // Relacionando o desenvolvedor ao login
+        login_id: login.login_id, 
       },
     });
 
@@ -66,7 +60,6 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
       });
     });
 
-    // Esperando a criação das habilidades
     await Promise.all(habilidadesPromises);
   }
   else if (serial === process.env.INSTALL_KEY) {
@@ -77,14 +70,11 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
       },
     });
 
-    //console.log("login", login);
-
-    // Criando o Desenvolvedor, com a relação ao Login
     user = await prisma.usuario.create({
       data: {
         nome: name,
-        login_id: login.login_id, // Relacionando o desenvolvedor ao login
-        roule: "super", // Definindo o papel como admin
+        login_id: login.login_id, 
+        roule: "super", 
       },
     });
 
@@ -101,30 +91,25 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
       });
     });
 
-    // Esperando a criação das habilidades
     await Promise.all(habilidadesPromises);
   }
   else {
     throw new Error("Serial inválido");
   }
 
-  //console.log ("login", login);
-  // Gerando o token para envio de verificação de e-mail
   const token = jwt.sign({ login_id: login.login_id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
 
   const verificationLink = `${process.env.FRONTEND_URL}/verificar-email?token=${token}`;
 
-  // Configuração do e-mail
   const mailOptions = {
-    from: '', // Remetente
-    to: login.email, // Destinatário
+    from: '', 
+    to: login.email, 
     subject: "Email Verification",
     html: `<b>Welcome ${user.nome}!</b><br/>Please click the link below to verify your email:<br/><a href="${verificationLink}">Verify Email</a>`,
   };
 
-  // Enviar o e-mail de verificação
   try {
     await transporter.sendMail(mailOptions);
     console.log(`Verification email sent to ${email}`);
@@ -139,7 +124,6 @@ export const registerUser = async ({ name, email, password, habilidades, serial 
 
 export const loginUser = async ({ email, password, provider}) => {
   const emailNotVerified = await prisma.login.findUnique({ where: { email, ativo: true } });
-  // console.log("emailNotVerified", emailNotVerified);
   if ((emailNotVerified != null) && (!emailNotVerified.is_verified)) throw new Error("Por favor, verifique seu e-mail para ativar sua conta.");
 
   const login = await prisma.login.findUnique({ where: { email, is_verified: true, provider: "local", ativo: true } });
@@ -147,11 +131,9 @@ export const loginUser = async ({ email, password, provider}) => {
   
   const isPasswordValid = await bcrypt.compare((process.env.HASH_SECRET + password), login.password);
   if (!isPasswordValid) throw new Error("Invalid email or password");
-  //console.log("login", login);
   const dev = await prisma.usuario.findUnique({
     where: { login_id: login.login_id },
   });
-  //console.log("dev", dev);
 
   const token = jwt.sign({ usuario_id: dev.usuario_id, nomeDesenvolvedor:dev.nome }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
@@ -161,15 +143,12 @@ export const loginUser = async ({ email, password, provider}) => {
 };
 
 export const verifyUserEmail = async (token) => {
-  //console.log("chamou o Service.verifyEmail");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //console.log("Decoded token:", decoded);
     const user = await prisma.login.update({
       where: { login_id: decoded.login_id},
       data: { is_verified: true },
     });
-    //console.log("User verified:", user);
     return true;
   } catch (error) {
     throw new Error("Invalid or expired token");
@@ -177,7 +156,6 @@ export const verifyUserEmail = async (token) => {
 };
 
 export const forgotPassword = async (email) => {
-  // console.log("sercice email:", email);
   const findEmail = await prisma.login.findFirst({
     where: {
       email: email,
@@ -186,34 +164,24 @@ export const forgotPassword = async (email) => {
       usuario: true,
     }
   });
-  // console.log("findEmail: ", findEmail);
   if ((findEmail) && (findEmail.provider != "local")) {
     const provider = findEmail.provider;
     const capitalizedProvider = provider.charAt(0).toUpperCase() + provider.slice(1);
 
     throw new Error("Login não realizado com email e senha!\nPor favor, utilize o login com o provedor: " + capitalizedProvider);
-    // throw new Error("Login não realizado com email e senha!\n Por favor, utilize o login com o provedor: " + findEmail.provider.toUpperCase);
   }
   if (findEmail) {
-    // console.log("entrou no if");
-    // Gerando o token para envio de recuperacao de senha
     const token = jwt.sign({ login_id: findEmail.usuario.login_id }, process.env.JWT_TEMP_SECRET, {
       expiresIn: "5m",
     });
 
-    // console.log( "token: ", token);
-
     const verificationLink = `${process.env.FRONTEND_URL}/password-reset?token=${token}`;
-    // console.log("verificationLinl: ", verificationLink);
-    // Configuração do e-mail
     const mailOptions = {
-      from: '', // Remetente
-      to: email, // Destinatário
+      from: '', 
+      to: email, 
       subject: "KANPRO Software - Redefir Senha",
       html: `<b>Olá ${findEmail.usuario.nome}!</b><br/>Clique no link para redefinir sua senha:<br/><a href="${verificationLink}">Redefinir senha</a><br><b>Se voce nao solicitou a troca de senha, desconcidere!</b>`,
     };
-    // console.log("mailOptions: ", mailOptions);
-    // Enviar o e-mail de verificação
     try {
       await transporter.sendMail(mailOptions);
       console.log(`Verification email sent to ${email}`);
@@ -228,7 +196,7 @@ export const forgotPassword = async (email) => {
 
 export const resetPassword = async (loginId, passWord) => {
   const hashedPassword = await bcrypt.hash((process.env.HASH_SECRET + passWord), 10);
-  // console.log("hasef: ", hashedPassword);
+
   return prisma.login.update ({
     where: {
       login_id: loginId,
@@ -254,7 +222,7 @@ export const finalizeProfile = async (userId, habilidades) => {
   const usuario = await prisma.usuario.findUnique({
     where: { login_id: userId },
   });
-  //console.log("habilidades", habilidades);
+
   const habilidadesPromises = habilidades.map(async (habilidades) => {
     const tecnologia = await prisma.tecnologia.findFirst({
       where: { descricao: habilidades },
@@ -302,7 +270,7 @@ export const disableUser = async(userId) => {
       login_id: true,
     }
   });
-  // console.log("login_id: ", login_id);
+
   return prisma.login.update ({
     where: {
       login_id: parseInt(login_id.login_id),
