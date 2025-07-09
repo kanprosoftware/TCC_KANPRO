@@ -1,4 +1,4 @@
-# 📌 KANPRO – Ferramenta de Gestão de Projetos
+# 📌 KANPRO – Uma ferramenta para gestão de projetos
 
 KANPRO é uma ferramenta gratuita e de código aberto para gestão de projetos, inspirada em plataformas que utilizan kanban e gantt. Desenvolvida como parte de um Trabalho de Conclusão de Curso, seu objetivo é auxiliar equipes na organização de tarefas, com funcionalidades como Kanban, gráfico de Gantt, controle de recursos, entre outras.
 
